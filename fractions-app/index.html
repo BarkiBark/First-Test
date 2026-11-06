@@ -1,243 +1,338 @@
-<title>מעבדת השברים</title>
+<title>מאפיית השברים</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Assistant:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Assistant:wght@400;600;700&display=swap">
 <style>
-/* Layout: one column. Unit chips on top, then a squared-notebook "stage" where the model moves, narration under it, and the controls last. */
+/* Layout: a game shell. Sticky HUD (home, coins, sound); a station map as home; each station is a chocolate "tray" stage, a mascot who talks, and chunky toy-like answer bubbles. */
 :root{
-  --bg:#EEF2F7; --surface:#FFFFFF; --paper:#FBFCFE; --grid:#E3E9F2;
-  --ink:#172033; --muted:#5A6679; --line:#D5DDE8; --chip:#E2E8F1;
-  --whole:#E9EEF5; --whole-edge:#C3CDDA; --cut:#FBFCFE;
-  --a:#EF8222; --a-soft:#FBE1C8; --b:#12968A; --b-soft:#CBEDE8; --x:#C9506A;
-  --ok:#1F7A45; --ok-soft:#DDF2E4; --bad:#A93A3A; --bad-soft:#F8E1DE; --hint-soft:#E6ECF8;
-  --focus:#2F6BE0;
+  --bg:#E8EEFF; --bg2:#F5F0FF; --surface:#FFFFFF; --ink:#24204A; --muted:#67658C; --line:#DCDDF2;
+  --btn:#2A2560; --btn-ink:#FFFFFF; --btn-deep:#120F33;
+  --tray:#F4F6FF; --tray-dot:#DFE4FA; --foil:#E3E6F3; --foil-edge:#C3C9E0; --cut:#F4F6FF;
+  --choc:#7B4529; --choc-hi:#A0623D; --straw:#EE6E9F; --straw-hi:#F7A1C2; --x:#E5484D;
+  --butter:#FFC83D; --butter-deep:#D99A00; --mint:#16A982; --mint-soft:#D5F5EB; --coral:#F0574A; --coral-soft:#FFE2DE; --tip-soft:#EEEAFF;
+  --c1:#C7F1E1; --c2:#E2D9FF; --c3:#FFDCC7; --c4:#D3E6FF; --c5:#FFEFAF; --c6:#FFD3E3;
+  --shadow:0 10px 30px rgba(40,30,110,.10);
+  --focus:#4C6BFF;
   --font-display:"Fredoka","Assistant","Arial Hebrew",system-ui,sans-serif;
   --font-body:"Assistant","Arial Hebrew","Segoe UI",system-ui,sans-serif;
-  --ease:cubic-bezier(.22,.8,.24,1);
+  --ease:cubic-bezier(.22,.8,.24,1); --spring:cubic-bezier(.34,1.56,.64,1);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F141C; --surface:#171E29; --paper:#141A24; --grid:#1D2532;
-  --ink:#E8EDF5; --muted:#9AA6B7; --line:#2A3445; --chip:#222B39;
-  --whole:#232C3A; --whole-edge:#3A4659; --cut:#141A24;
-  --a:#F5973F; --a-soft:#4A2F16; --b:#2BB8A9; --b-soft:#123A36; --x:#E0708A;
-  --ok:#5CCB8A; --ok-soft:#173226; --bad:#F09088; --bad-soft:#3A1E1E; --hint-soft:#1E2840;
-  --focus:#7EA6FF; color-scheme:dark}}
+  --bg:#13122E; --bg2:#1B1440; --surface:#211F4A; --ink:#F3F1FF; --muted:#A6A3CC; --line:#35336A;
+  --btn:#9D8CFF; --btn-ink:#130F33; --btn-deep:#5E4CD6;
+  --tray:#1A1940; --tray-dot:#26245A; --foil:#2D2B5E; --foil-edge:#45437F; --cut:#1A1940;
+  --choc:#8A5233; --choc-hi:#B27148; --straw:#F07FAB; --straw-hi:#F7A9C8; --x:#FF6B70;
+  --butter:#FFCF52; --butter-deep:#C98F00; --mint:#3DD6AA; --mint-soft:#163D36; --coral:#FF7A6E; --coral-soft:#45222A; --tip-soft:#2B2860;
+  --c1:#183F38; --c2:#2E2862; --c3:#45302A; --c4:#1E3155; --c5:#40391C; --c6:#4A2340;
+  --shadow:0 10px 30px rgba(0,0,0,.35); --focus:#9DB0FF; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0F141C; --surface:#171E29; --paper:#141A24; --grid:#1D2532;
-  --ink:#E8EDF5; --muted:#9AA6B7; --line:#2A3445; --chip:#222B39;
-  --whole:#232C3A; --whole-edge:#3A4659; --cut:#141A24;
-  --a:#F5973F; --a-soft:#4A2F16; --b:#2BB8A9; --b-soft:#123A36; --x:#E0708A;
-  --ok:#5CCB8A; --ok-soft:#173226; --bad:#F09088; --bad-soft:#3A1E1E; --hint-soft:#1E2840;
-  --focus:#7EA6FF; color-scheme:dark}
+  --bg:#13122E; --bg2:#1B1440; --surface:#211F4A; --ink:#F3F1FF; --muted:#A6A3CC; --line:#35336A;
+  --btn:#9D8CFF; --btn-ink:#130F33; --btn-deep:#5E4CD6;
+  --tray:#1A1940; --tray-dot:#26245A; --foil:#2D2B5E; --foil-edge:#45437F; --cut:#1A1940;
+  --choc:#8A5233; --choc-hi:#B27148; --straw:#F07FAB; --straw-hi:#F7A9C8; --x:#FF6B70;
+  --butter:#FFCF52; --butter-deep:#C98F00; --mint:#3DD6AA; --mint-soft:#163D36; --coral:#FF7A6E; --coral-soft:#45222A; --tip-soft:#2B2860;
+  --c1:#183F38; --c2:#2E2862; --c3:#45302A; --c4:#1E3155; --c5:#40391C; --c6:#4A2340;
+  --shadow:0 10px 30px rgba(0,0,0,.35); --focus:#9DB0FF; color-scheme:dark}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.55;direction:rtl}
-.app{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{background:linear-gradient(180deg,var(--bg2),var(--bg) 420px) var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.5;direction:rtl;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg2)}
 button{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 b{font-weight:700}
-mark{background:none;color:var(--a);font-weight:600}
+mark{background:none;color:var(--straw);font-weight:700}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-/* header */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px}
-.brand h1{font:600 28px/1.1 var(--font-display);margin:0;letter-spacing:-.01em}
-.brand p{margin:2px 0 0;color:var(--muted);font-size:15px}
-.logo{width:44px;height:44px;flex:none}
-.method{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
-.method span{padding:3px 10px;border-radius:999px;background:var(--chip);color:var(--ink);font-weight:600}
+/* HUD */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg2) 82%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.hud .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:10px}
+.home-link{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:0;border-radius:12px}
+.home-link .kobi{width:40px;height:40px}
+.home-link span{font:700 21px var(--font-display);letter-spacing:-.01em}
+.stats{display:flex;align-items:center;gap:8px}
+.stat{display:flex;align-items:center;gap:6px;padding:6px 12px 6px 10px;border-radius:999px;background:var(--surface);box-shadow:0 2px 0 var(--line);font:600 17px var(--font-display);font-variant-numeric:tabular-nums}
+.stat svg{width:22px;height:22px}
+.stat.bump{animation:bump .35s var(--spring)}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:0;background:var(--surface);box-shadow:0 2px 0 var(--line);cursor:pointer;display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+@keyframes bump{50%{transform:scale(1.18)}}
 
-/* unit chips */
-.units{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-inline:-4px;padding-inline:4px}
-.units::-webkit-scrollbar{display:none}
-.uchip{position:relative;flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;text-align:start}
-.uchip .n{font:600 18px var(--font-display);color:var(--muted);width:20px;text-align:center}
-.uchip .t{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:15px;line-height:1.1}
-.uchip[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.uchip[aria-current="true"] .n{color:var(--a)}
-.pips{display:flex;gap:2px;width:60px;height:6px}
-.pips i{flex:1;background:var(--whole-edge);opacity:.55}
-.pips i:first-child{border-radius:0 3px 3px 0}.pips i:last-child{border-radius:3px 0 0 3px}
-.pips i.on{background:var(--a);opacity:1}
+main.wrap{padding-block:22px 64px;display:flex;flex-direction:column;gap:22px}
 
-/* unit head */
-.uhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.uhead h2{font:600 32px/1.15 var(--font-display);margin:0;text-wrap:balance}
-.uhead p{margin:4px 0 0;color:var(--muted);max-width:52ch}
-.phases{display:inline-flex;background:var(--chip);border-radius:14px;padding:4px;gap:2px}
-.phases button{border:0;background:none;padding:8px 14px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;color:var(--muted);display:flex;gap:6px;align-items:center}
-.phases button .k{font:500 14px var(--font-display)}
-.phases button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+/* buttons */
+.tbtn{font:600 18px var(--font-display);padding:12px 22px;border-radius:16px;border:0;background:var(--btn);color:var(--btn-ink);box-shadow:0 5px 0 var(--btn-deep);cursor:pointer;transition:transform .12s,box-shadow .12s;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.tbtn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--btn-deep)}
+.tbtn:disabled{opacity:.4;cursor:default}
+.tbtn.ghost{background:var(--surface);color:var(--ink);box-shadow:0 5px 0 var(--line)}
+.tbtn.ghost:active:not(:disabled){box-shadow:0 1px 0 var(--line)}
+.tbtn.sun{background:var(--butter);color:#3A2600;box-shadow:0 5px 0 var(--butter-deep)}
+.tbtn.sm{font-size:16px;padding:9px 16px;border-radius:14px}
 
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+/* hero */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;padding:8px 0 4px}
+.hero .kobi{width:150px;height:150px;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px) rotate(-2deg)}}
+.hero h1{font:700 46px/1.05 var(--font-display);margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--choc)}
+:root[data-theme="dark"] .hero h1 em{color:var(--choc-hi)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hero h1 em{color:var(--choc-hi)}}
+.speech{position:relative;background:var(--surface);border-radius:20px;padding:12px 16px;box-shadow:var(--shadow);max-width:52ch;font-size:18px}
+.speech::before{content:"";position:absolute;right:-9px;top:22px;border:10px solid transparent;border-left-color:var(--surface);border-right:0}
+.hero .speech::before{top:auto;bottom:-9px;right:30px;border:10px solid transparent;border-top-color:var(--surface);border-bottom:0}
+.hero .speech{margin-top:4px}
 
-/* stage */
-.stage{position:relative;min-height:290px;padding:30px 24px;background-color:var(--paper);
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:22px 22px;background-position:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.stage.mini{min-height:0;padding:24px 20px}
+/* map */
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sechead h2{font:700 26px var(--font-display);margin:0}
+.sechead p{margin:0;color:var(--muted)}
+.map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{position:relative;background:var(--surface);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.card .band{height:112px;display:grid;place-items:center;position:relative}
+.card .badge{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:700 18px var(--font-display)}
+.card .stars{position:absolute;top:14px;left:12px;display:flex;gap:2px}
+.stars svg{width:22px;height:22px}
+.card .body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{margin:0;font:700 21px var(--font-display)}
+.card p{margin:0;color:var(--muted);font-size:15px;flex:1}
+.card .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.card.next-up{outline:3px solid var(--butter);outline-offset:-3px}
+.card .nexttag{position:absolute;bottom:10px;left:12px;font:600 13px var(--font-display);background:var(--butter);color:#3A2600;padding:2px 10px;border-radius:999px}
+
+/* mini static chocolate */
+.mbar{display:inline-flex;gap:3px;height:34px;width:170px;max-width:100%;padding:4px;background:var(--surface);border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.mbar i{flex:1;border-radius:4px;background:var(--foil)}
+.mbar i.a{background:var(--choc);box-shadow:inset 0 2px 0 var(--choc-hi),inset 0 -3px 0 rgba(0,0,0,.18)}
+.mbar i.b{background:var(--straw);box-shadow:inset 0 2px 0 var(--straw-hi),inset 0 -3px 0 rgba(0,0,0,.12)}
+.mbar.sm{height:24px;width:120px;padding:3px;gap:2px}
+.artstack{display:flex;flex-direction:column;gap:8px;align-items:center}
+.mgrid{display:grid;width:76px;height:76px;gap:3px;padding:4px;background:var(--surface);border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.mgrid i{background:var(--foil);border-radius:3px}
+.mgrid i.a{background:var(--choc)}.mgrid i.b{background:var(--straw)}
+.mgrid i.ab{background:repeating-linear-gradient(45deg,var(--choc) 0 5px,var(--straw) 5px 10px)}
+
+/* station head */
+.shead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.shead .ttl{display:flex;align-items:center;gap:12px}
+.shead .num{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font:700 24px var(--font-display)}
+.shead h2{margin:0;font:700 30px/1.1 var(--font-display)}
+.shead p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.tabs{display:inline-flex;background:var(--surface);border-radius:16px;padding:5px;gap:4px;box-shadow:0 3px 0 var(--line)}
+.tabs button{border:0;background:none;padding:9px 16px;border-radius:12px;font:600 16px var(--font-display);cursor:pointer;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink)}
+
+.panel{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+
+/* stage = chocolate tray */
+.stage{position:relative;min-height:280px;padding:30px 26px;background-color:var(--tray);background-image:radial-gradient(var(--tray-dot) 1.6px,transparent 1.8px);background-size:20px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.stage.mini{min-height:0;padding:22px 20px}
 .bars{position:relative;width:100%;max-width:640px;display:flex;flex-direction:column;gap:14px}
 .brow{display:flex;align-items:center;gap:14px;transition:opacity .4s var(--ease),transform .6s var(--ease)}
-.brow.enter{opacity:0;transform:translateY(10px)}
+.brow.enter{opacity:0;transform:translateY(12px) scale(.97)}
 .brow.leave{opacity:0;pointer-events:none}
 .brow.dim{opacity:.4}
-.blabel{flex:none;width:76px;min-height:30px;display:flex;justify-content:center;align-items:center;font:500 22px var(--font-display);unicode-bidi:isolate}
-.brow.sm .blabel{font-size:18px}
+.blabel{flex:none;width:76px;min-height:30px;display:flex;justify-content:center;align-items:center;font:600 24px var(--font-display);unicode-bidi:isolate}
+.brow.sm .blabel{font-size:19px}
 .blabel.roll{animation:roll .45s var(--ease)}
 .brow.mark-bad .blabel{color:var(--x)}
-.track{position:relative;flex:1;min-width:0;height:54px;background:var(--whole);border-radius:10px}
-.brow.sm .track{height:34px}
-.track::after,.area::after{content:"";position:absolute;inset:0;border-radius:10px;box-shadow:inset 0 0 0 2px var(--whole-edge);pointer-events:none;z-index:3}
-.fill{position:absolute;top:0;bottom:0;transition:right .6s var(--ease),width .6s var(--ease),transform .75s var(--ease),opacity .35s}
-.fill.s{border-top-right-radius:10px;border-bottom-right-radius:10px}
-.fill.e{border-top-left-radius:10px;border-bottom-left-radius:10px}
-.fill.a{background:var(--a)}.fill.b{background:var(--b)}.fill.x{background:var(--x)}
+.track{position:relative;flex:1;min-width:0;height:58px;background:var(--foil);border-radius:12px;box-shadow:0 4px 0 rgba(0,0,0,.07)}
+.brow.sm .track{height:36px;border-radius:9px}
+.track::after,.area::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px var(--foil-edge);pointer-events:none;z-index:3}
+.fill{position:absolute;top:0;bottom:0;transition:right .6s var(--ease),width .6s var(--ease),transform .75s var(--ease),opacity .35s;background-repeat:repeat-x}
+.fill.s{border-top-right-radius:12px;border-bottom-right-radius:12px}
+.fill.e{border-top-left-radius:12px;border-bottom-left-radius:12px}
+.fill.a{background-color:var(--choc);background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0 14%,transparent 14% 76%,rgba(0,0,0,.20) 76%),linear-gradient(90deg,rgba(0,0,0,.12) 0 9%,transparent 9% 91%,rgba(255,255,255,.12) 91%)}
+.fill.b{background-color:var(--straw);background-image:linear-gradient(180deg,rgba(255,255,255,.28) 0 14%,transparent 14% 76%,rgba(0,0,0,.12) 76%),linear-gradient(90deg,rgba(0,0,0,.08) 0 9%,transparent 9% 91%,rgba(255,255,255,.15) 91%)}
+.fill.x{background-color:var(--x)}
 .fill.gone{opacity:0}
-.cut{position:absolute;top:0;bottom:0;width:3px;margin-right:-1.5px;background:var(--cut);z-index:2;transition:transform .45s var(--ease),opacity .3s}
-.hcut{position:absolute;left:0;right:0;height:3px;margin-top:-1.5px;background:var(--cut);z-index:2;transition:transform .45s var(--ease),opacity .3s}
+.cut{position:absolute;top:0;bottom:0;width:4px;margin-right:-2px;background:var(--cut);z-index:2;transition:transform .45s var(--spring),opacity .3s}
+.hcut{position:absolute;left:0;right:0;height:4px;margin-top:-2px;background:var(--cut);z-index:2;transition:transform .45s var(--spring),opacity .3s}
 .cut.in{transform:scaleY(0)}.hcut.in{transform:scaleX(0)}
 .cut.gone,.hcut.gone{opacity:0}
-.area{position:relative;width:min(270px,64vw);aspect-ratio:1;max-width:100%;background:var(--whole);border-radius:10px}
+.area{position:relative;width:min(260px,62vw);aspect-ratio:1;max-width:100%;background:var(--foil);border-radius:14px;box-shadow:0 5px 0 rgba(0,0,0,.08)}
 .area>.colf,.area>.rowf,.area>.ovl{position:absolute;transition:width .6s var(--ease),height .6s var(--ease),opacity .5s}
-.colf{top:0;right:0;bottom:0;width:0;background:var(--a);border-radius:0 10px 10px 0}
-.rowf{top:0;right:0;left:0;height:0;background:var(--b);opacity:.55;border-radius:10px 10px 0 0}
-.ovl{top:0;right:0;width:0;height:0;opacity:0;background:repeating-linear-gradient(45deg,var(--a) 0 7px,var(--b) 7px 14px);border-top-right-radius:10px;z-index:1}
-.area.ov .colf{opacity:.45}
+.colf{top:0;right:0;bottom:0;width:0;background:var(--choc);border-radius:0 14px 14px 0}
+.rowf{top:0;right:0;left:0;height:0;background:var(--straw);opacity:.6;border-radius:14px 14px 0 0}
+.ovl{top:0;right:0;width:0;height:0;opacity:0;background:repeating-linear-gradient(45deg,var(--choc) 0 8px,var(--straw) 8px 16px);border-top-right-radius:14px;z-index:1}
+.area.ov .colf{opacity:.4}
 .area.ov .ovl{opacity:1}
 .stage.still *{transition:none!important;animation:none!important}
 
-/* narration */
-.narr{padding:20px 24px 8px;display:flex;flex-direction:column;align-items:center;gap:10px;border-top:1px solid var(--line)}
-.eq{font:500 26px var(--font-display);min-height:66px;display:flex;align-items:center;justify-content:center}
-.eqline{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:10px}
-.eq.swap,.say.swap{animation:roll .45s var(--ease)}
-.say{margin:0;font-size:18px;max-width:60ch;text-align:center;text-wrap:pretty;min-height:1.6em}
-.fr{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;vertical-align:middle;font-family:var(--font-display);font-weight:500;unicode-bidi:isolate;direction:ltr}
+/* math type */
+.fr{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;vertical-align:middle;font-family:var(--font-display);font-weight:600;unicode-bidi:isolate;direction:ltr}
 .fr>span{padding:0 .2em;min-width:.9em;text-align:center}
 .fr>.fd{border-top:.09em solid currentColor;padding-top:.04em}
-.say .fr,.prose .fr,.fbk .fr,.qtext .fr{font-size:.92em;margin:0 .1em}
-.mx{display:inline-flex;align-items:center;gap:.08em;unicode-bidi:isolate;direction:ltr;font-family:var(--font-display);vertical-align:middle}
-.op{color:var(--muted);font-weight:400}
+.speech .fr,.prose .fr,.kb .fr,.qline .fr,.card .fr{font-size:.9em;margin:0 .1em}
+.mx{display:inline-flex;align-items:center;gap:.08em;unicode-bidi:isolate;direction:ltr;font-family:var(--font-display);font-weight:600;vertical-align:middle}
+.op{color:var(--muted);font-weight:500}
 .num{font-variant-numeric:tabular-nums}
-.kk{display:inline-flex;flex-direction:column;justify-content:space-between;height:2.3em;font-size:.55em;color:var(--a);font-weight:600;margin-inline:-4px}
-.m{unicode-bidi:isolate;direction:ltr;display:inline-block;font-family:var(--font-display);font-weight:500;white-space:nowrap}
+.kk{display:inline-flex;flex-direction:column;justify-content:space-between;height:2.3em;font-size:.55em;color:var(--straw);font-weight:700;margin-inline:-4px}
+.m{unicode-bidi:isolate;direction:ltr;display:inline-block;font-family:var(--font-display);font-weight:600;white-space:nowrap}
+.eqline{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:10px}
 @keyframes roll{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.swap{animation:roll .45s var(--ease)}
 
-.ask{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0 4px}
-.ask .qtext{font-weight:700;font-size:18px;text-align:center;margin:0}
-.opts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.opt{min-width:84px;min-height:64px;padding:8px 16px;border:2px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;font:500 22px var(--font-display);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s}
-.opt.txt{font:600 16px var(--font-body);min-height:52px;max-width:100%;text-align:center}
-.opt:hover:not(:disabled){border-color:var(--ink)}
-.opt:disabled{cursor:default}
-.opt.right{border-color:var(--ok);background:var(--ok-soft)}
-.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
-.opts.col{flex-direction:column;align-items:stretch;width:100%}
+/* lesson */
+.eqtag{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);background:var(--surface);border-radius:18px;padding:8px 18px;box-shadow:var(--shadow);font:600 26px var(--font-display);min-height:56px;display:flex;align-items:center;white-space:nowrap;z-index:4}
+.eqtag:empty{display:none}
+.talk{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:44px 26px 8px}
+.talk .kobi{width:72px;height:72px}
+.talk .speech{max-width:none;box-shadow:none;background:var(--tip-soft)}
+.talk .speech::before{border-left-color:var(--tip-soft)}
+.talk .speech p{margin:0}
+.ask{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.ask .qline{font-weight:700}
+.bubs{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.bub{min-width:92px;min-height:76px;padding:8px 18px;border:0;border-radius:20px;background:var(--surface);box-shadow:0 0 0 3px var(--line),0 6px 0 3px var(--line);cursor:pointer;font:600 26px var(--font-display);display:flex;align-items:center;justify-content:center;transition:transform .15s var(--spring),box-shadow .15s,background .2s;margin-bottom:6px}
+.bub.txt{font:600 18px var(--font-display);min-height:58px}
+.bub:hover:not(:disabled){transform:translateY(-3px)}
+.bub:active:not(:disabled){transform:translateY(4px);box-shadow:0 0 0 3px var(--line),0 1px 0 3px var(--line)}
+.bub:disabled{cursor:default}
+.bub.right{background:var(--mint-soft);box-shadow:0 0 0 3px var(--mint),0 6px 0 3px var(--mint);animation:pop .4s var(--spring)}
+.bub.wrong{background:var(--coral-soft);box-shadow:0 0 0 3px var(--coral),0 2px 0 3px var(--coral);opacity:.75;animation:shake .4s}
+.bub.knife{gap:8px;font-size:20px}
+.bub.knife svg{width:22px;height:22px}
+@keyframes pop{40%{transform:scale(1.1)}}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.lfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 26px 24px}
+.dots{display:flex;gap:6px;align-items:center}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line);transition:all .3s var(--ease)}
+.dots i.on{background:var(--btn)}
+.dots i.cur{width:26px;border-radius:6px;background:var(--btn)}
 
-.ctrls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px 20px}
-.steps{display:flex;gap:3px;flex:1;max-width:260px;height:8px}
-.steps i{flex:1;background:var(--whole-edge);opacity:.5}
-.steps i:first-child{border-radius:0 4px 4px 0}.steps i:last-child{border-radius:4px 0 0 4px}
-.steps i.on{background:var(--ink);opacity:1}
-.btn{font:600 16px var(--font-body);padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;white-space:nowrap}
-.btn:hover:not(:disabled){border-color:var(--ink)}
-.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn:disabled{opacity:.35;cursor:default}
+/* recipe card */
+.recipe{padding:28px 26px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start}
+.recipe .kobi{width:96px;height:96px}
+.rcard{background:var(--c5);border-radius:22px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;position:relative}
+.rcard .tag{font:700 14px var(--font-display);letter-spacing:.04em;color:var(--muted)}
+.rcard h3{margin:0;font:700 24px/1.3 var(--font-display);text-wrap:balance}
+.rcard ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.rcard li{counter-increment:s;display:flex;gap:10px;align-items:center;background:var(--surface);border-radius:14px;padding:10px 14px}
+.rcard li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center;font:600 14px var(--font-display)}
 
-/* understand */
-.und{display:grid;gap:0}
-.block{padding:22px 24px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
-.block:first-child{border-top:0}
-.kicker{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
-.block h3{margin:0;font:600 21px/1.3 var(--font-display);text-wrap:balance}
-.prose{margin:0;max-width:62ch}
-.wsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:s}
-.wsteps li{counter-increment:s;display:flex;gap:12px;align-items:center;padding:10px 14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;animation:roll .45s var(--ease)}
-.wsteps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 14px var(--font-display)}
-.wsteps li.final{background:var(--ok-soft);border-color:transparent}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+/* game */
+.gtop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;flex-wrap:wrap}
+.plates{display:flex;gap:6px}
+.plate{width:30px;height:30px;border-radius:50%;background:var(--tray);box-shadow:inset 0 0 0 3px var(--line);display:grid;place-items:center;transition:all .3s var(--spring)}
+.plate.cur{box-shadow:inset 0 0 0 3px var(--btn)}
+.plate.done{background:var(--choc);box-shadow:inset 0 0 0 3px var(--choc-hi);transform:scale(1.05)}
+.plate.done.ok::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--butter)}
+.gcount{font:600 15px var(--font-display);color:var(--muted)}
+.order{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:0 22px 18px}
+.cust{width:76px;height:76px;animation:bob 3s ease-in-out infinite}
+.cust svg{width:100%;height:100%}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.order .speech{max-width:none}
+.order .speech .who{font:700 15px var(--font-display);color:var(--muted);display:block}
+.order .speech p{margin:0;font-size:19px}
+.order.happy .cust{animation:hop .6s var(--spring)}
+@keyframes hop{40%{transform:translateY(-14px) rotate(-6deg)}}
+.work{padding:22px 22px 8px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.stepq{font:600 19px var(--font-display);text-align:center;margin:0;text-wrap:balance}
+.kline{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin:4px 22px 0;padding:12px 14px;border-radius:20px;background:var(--tip-soft);animation:roll .35s var(--ease)}
+.kline.ok{background:var(--mint-soft)}
+.kline.bad{background:var(--coral-soft)}
+.kline .kobi{width:52px;height:52px}
+.kb{margin:0;font-size:17px}
+.gact{display:flex;justify-content:space-between;gap:10px;padding:16px 22px 22px;flex-wrap:wrap}
 
-/* practice */
-.prac{display:flex;flex-direction:column}
-.pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.meter{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
-.meter .pips{width:110px;height:10px}
-.meter .pips i:first-child{border-radius:0 5px 5px 0}.meter .pips i:last-child{border-radius:5px 0 0 5px}
-.from{font-size:13px;font-weight:700;color:var(--muted);background:var(--chip);padding:3px 10px;border-radius:999px}
-.qbody{padding:22px 24px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.qtext{margin:0;font-size:19px;font-weight:600;text-align:center;max-width:56ch;text-wrap:pretty}
-.qeq{font:500 28px var(--font-display);display:flex;justify-content:center}
-.nbox,.fin input{width:58px;height:48px;font:600 24px var(--font-display);text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
-.nbox:focus,.fin input:focus{border-color:var(--focus);outline:none}
-.fin{display:inline-flex;flex-direction:column;align-items:center;gap:5px}
-.fin i{width:66px;height:3px;background:var(--ink);border-radius:2px}
-.fr .nbox{width:52px;height:44px;font-size:22px;margin:2px 0}
-.shade{display:flex;gap:3px;width:100%;max-width:560px;height:60px;direction:rtl}
-.shade button{flex:1;border:0;background:var(--whole);cursor:pointer;box-shadow:inset 0 0 0 2px var(--whole-edge);transition:background .2s}
-.shade button:first-child{border-radius:0 10px 10px 0}.shade button:last-child{border-radius:10px 0 0 10px}
-.shade button[aria-pressed="true"]{background:var(--a);box-shadow:none}
-.shade-count{font-size:15px;color:var(--muted)}
-.fbk{width:100%;max-width:600px;border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
-.fbk.ok{background:var(--ok-soft)}
-.fbk.ok strong{color:var(--ok)}
-.fbk.bad{background:var(--bad-soft)}
-.fbk.bad strong{color:var(--bad)}
-.fbk.hint{background:var(--hint-soft)}
-.fbk p{margin:0}
-.qact{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+/* cutter */
+.cutter{width:100%;max-width:620px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.stepper{display:flex;align-items:center;gap:10px;background:var(--tray);padding:6px;border-radius:18px}
+.stepper button{width:46px;height:46px;border-radius:14px;border:0;background:var(--surface);box-shadow:0 4px 0 var(--line);font:700 26px var(--font-display);cursor:pointer}
+.stepper button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.stepper .kn{min-width:44px;text-align:center;font:700 28px var(--font-display)}
+.stepper .lbl{padding-inline:6px 10px;color:var(--muted);font-weight:600}
+.tapbar{display:flex;gap:4px;width:100%;height:70px;padding:5px;background:var(--surface);border-radius:16px;box-shadow:0 0 0 2px var(--foil-edge),0 5px 0 2px var(--foil-edge)}
+.tapbar button{flex:1;border:0;border-radius:9px;background:var(--foil);cursor:pointer;animation:pop .35s var(--spring);transition:background .15s,transform .15s}
+.tapbar button:hover{transform:translateY(-2px)}
+.tapbar button[aria-pressed="true"]{background:var(--choc);box-shadow:inset 0 3px 0 var(--choc-hi),inset 0 -5px 0 rgba(0,0,0,.2)}
+.takeinfo{font:600 17px var(--font-display);color:var(--muted)}
 
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
-.rule{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);display:flex;flex-direction:column;gap:4px}
-.rule .h{font-size:13px;font-weight:700;color:var(--muted)}
-.rule .x{font:500 20px var(--font-display);display:flex;align-items:center;gap:6px;direction:ltr;justify-content:flex-end;flex-wrap:wrap}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:600px}
+.mcard{aspect-ratio:3/3.4;perspective:800px;border:0;background:none;padding:0;cursor:pointer}
+.mcard .in{position:relative;width:100%;height:100%;transition:transform .5s var(--spring);transform-style:preserve-3d}
+.mcard.up .in,.mcard.got .in{transform:rotateY(180deg)}
+.mcard .f,.mcard .b{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.mcard .f{background:var(--btn);box-shadow:0 5px 0 var(--btn-deep)}
+.mcard .f .kobi{width:46%;height:auto;opacity:.9}
+.mcard .b{transform:rotateY(180deg);background:var(--surface);box-shadow:0 0 0 3px var(--line),0 5px 0 3px var(--line);font:600 30px var(--font-display);padding:6px}
+.mcard.got .b{box-shadow:0 0 0 3px var(--mint),0 5px 0 3px var(--mint);background:var(--mint-soft)}
+.mcard .b .mbar{width:92%;height:26px;padding:3px;gap:2px}
+.mcard .b small{font-size:17px;color:var(--muted)}
 
-details.guide{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 20px}
-details.guide summary{cursor:pointer;font-weight:700}
-details.guide ul{margin:10px 0 0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px;max-width:70ch}
+/* level end */
+.over{position:absolute;inset:0;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;z-index:10;animation:roll .4s var(--ease)}
+.over h3{margin:0;font:700 34px var(--font-display)}
+.over p{margin:0;color:var(--muted);max-width:44ch}
+.bigstars{display:flex;gap:8px}
+.bigstars svg{width:64px;height:64px;animation:pop .5s var(--spring) both}
+.bigstars svg:nth-child(2){animation-delay:.15s;transform:translateY(-10px)}
+.bigstars svg:nth-child(3){animation-delay:.3s}
+
+/* race */
+.race{padding:26px 22px;display:flex;flex-direction:column;align-items:center;gap:18px;min-height:420px}
+.rtop{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 18px var(--font-display)}
+.timer{flex:1;height:14px;background:var(--tray);border-radius:999px;overflow:hidden;max-width:420px}
+.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),var(--butter));border-radius:999px;transition:width .25s linear}
+.combo{color:var(--straw)}
+.rq{font:600 40px var(--font-display);min-height:110px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;text-align:center}
+.rq .qline{font:600 18px var(--font-body);color:var(--muted)}
+.floaty{position:fixed;pointer-events:none;font:700 24px var(--font-display);color:var(--mint);z-index:60;animation:up 1s var(--ease) forwards}
+@keyframes up{to{transform:translateY(-50px);opacity:0}}
+
+.flycoin{position:fixed;width:26px;height:26px;z-index:70;pointer-events:none}
+canvas.fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
+
+details.guide{background:var(--surface);border-radius:20px;padding:16px 20px;box-shadow:var(--shadow)}
+details.guide summary{cursor:pointer;font:600 17px var(--font-display)}
+details.guide ul{margin:10px 0 0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
+@media (max-width:760px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){
-  .brand h1{font-size:24px}
-  .uhead h2{font-size:26px}
-  .stage{padding:22px 14px;min-height:250px}
-  .blabel{width:54px;font-size:19px}
-  .track{height:46px}
-  .narr,.block,.qbody{padding-left:16px;padding-right:16px}
-  .ctrls{padding:10px 16px 16px}
-  .eq{font-size:22px}
-  .say{font-size:17px}
-  .btn{padding:10px 14px}
-  .pbar{padding:12px 16px}
-  .phases button{padding:8px 10px;font-size:14px}
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center;gap:8px}
+  .hero .kobi{width:112px;height:112px}
+  .hero h1{font-size:36px}
+  .hero .speech{text-align:start}
+  .map{grid-template-columns:1fr}
+  .home-link span{font-size:18px}
+  .stat{padding:5px 10px 5px 8px;font-size:15px}
+  .stage{padding:22px 14px;min-height:240px}
+  .blabel{width:54px;font-size:20px}
+  .track{height:48px}
+  .talk{padding:42px 16px 6px;gap:10px}
+  .talk .kobi{width:52px;height:52px}
+  .lfoot,.gact{padding-left:16px;padding-right:16px}
+  .order{padding:0 16px 14px}.cust{width:60px;height:60px}
+  .order .speech p{font-size:17px}
+  .work{padding:18px 16px 6px}
+  .kline{margin:4px 16px 0}
+  .bub{min-width:78px;min-height:68px;font-size:23px;padding:8px 12px}
+  .eqtag{font-size:21px;padding:6px 14px}
+  .recipe{grid-template-columns:1fr;padding:22px 16px}
+  .recipe .kobi{width:72px;height:72px}
+  .mem{gap:8px}.mcard .b{font-size:24px}
+  .shead h2{font-size:25px}
+  .tapbar{height:60px}
+  .rq{font-size:32px}
 }
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-<div class="app">
-  <header class="top">
-    <div class="brand">
-      <svg class="logo" viewBox="0 0 44 44" aria-hidden="true"><rect x="2" y="12" width="40" height="20" rx="5" fill="var(--whole)" stroke="var(--whole-edge)" stroke-width="2"/><path d="M42 17a5 5 0 0 0-5-5H12v20h25a5 5 0 0 0 5-5z" fill="var(--a)"/><rect x="11" y="12" width="2" height="20" fill="var(--cut)"/><rect x="21" y="12" width="2" height="20" fill="var(--cut)"/><rect x="31" y="12" width="2" height="20" fill="var(--cut)"/></svg>
-      <div><h1>מעבדת השברים</h1><p>לכיתה ה׳ · לומדים לראות שברים, לא רק לחשב אותם</p></div>
-    </div>
-    <div class="method" aria-label="שלושת השלבים בכל נושא"><span>רואים</span>←<span>מבינים</span>←<span>מתרגלים</span></div>
-  </header>
-  <nav class="units" id="units" aria-label="נושאים"></nav>
-  <section class="uhead" id="uhead"></section>
-  <main class="panel" id="panel"></main>
-  <details class="guide">
-    <summary>להורים ולמורים: איך האפליקציה מלמדת</summary>
-    <ul>
-      <li><b>מוחשי ← ציורי ← מופשט.</b> כל כלל מופיע קודם כפעולה על מודל (חפיסה נחתכת, חתיכות עוברות), ורק אחר כך כתרגיל במספרים.</li>
-      <li><b>ניבוי לפני הסבר.</b> בשלב "רואים" הילד מנחש מה יקרה לפני שהאנימציה מראה. ניחוש, גם שגוי, מחזק את הזיכרון של ההסבר שבא אחריו.</li>
-      <li><b>קצב של הלומד.</b> כל צעד מציג רעיון אחד, והמעבר הבא מתחיל רק בלחיצה.</li>
-      <li><b>דוגמה פתורה ואז דוגמה חלקית.</b> בשלב "מבינים" רואים פתרון מלא, צעד אחרי צעד, ואחר כך משלימים בעצמם את הצעד החסר. בסוף שאלת "למה?" שמבקשת להסביר את הרעיון.</li>
-      <li><b>משוב שמזהה את הטעות.</b> טעויות נפוצות (חיבור מכנים, הכפלת המכנה במספר שלם, היפוך מונה ומכנה) מקבלות הסבר ממוקד, והמודל מראה את הפתרון.</li>
-      <li><b>שליטה ותרגול מעורב.</b> הפס של כל נושא מתמלא רק בתשובה נכונה בניסיון הראשון ובלי רמז. "תרגול מעורב" מערבב את כל הנושאים ומעדיף את אלה שעוד לא נשלטו, כך שהילד צריך לזהות בעצמו איזה כלל מתאים.</li>
-    </ul>
-  </details>
-</div>
-
+<header class="hud"><div class="wrap">
+  <button class="home-link" id="homeBtn" aria-label="חזרה למפה"><span id="hudKobi"></span><span>מאפיית השברים</span></button>
+  <div class="stats">
+    <span class="stat" id="coinStat" title="מטבעות"><span id="coinIcon"></span><span id="coins">0</span></span>
+    <span class="stat" title="כוכבים"><span id="starIcon"></span><span id="starsTotal">0</span></span>
+    <button class="iconbtn" id="soundBtn" aria-label="צלילים"></button>
+  </div>
+</div></header>
+<main class="wrap" id="view"></main>
+<canvas class="fx" id="fx" aria-hidden="true"></canvas>
 <script>
 document.documentElement.lang = 'he';
 document.documentElement.dir = 'rtl';
@@ -316,7 +411,8 @@ class Stage {
       host.appendChild(el); map.set(key, el);
     }
   }
-  static setFill(el, f) {
+  static setFill(el, f, parts) {
+    const k = Math.max(1, Math.round((f.to - f.from) * parts)); el.style.backgroundSize = (100 / k) + "% 100%";
     el.className = 'fill ' + f.tone + (f.from <= 0 ? ' s' : '') + (f.to >= 1 ? ' e' : '');
     el.style.right = f.from * 100 + '%'; el.style.width = (f.to - f.from) * 100 + '%';
   }
@@ -356,12 +452,12 @@ class Stage {
       for (const f of b.fills) {
         let rec = this.fills.get(f.id), flyFrom = null;
         if (rec && rec.bar !== b.id) { flyFrom = oldFill.get(f.id); rec.el.remove(); this.fills.delete(f.id); rec = null; }
-        if (rec) { Stage.setFill(rec.el, f); continue; }
+        if (rec) { Stage.setFill(rec.el, f, b.parts); continue; }
         const el = document.createElement('div'); r.track.appendChild(el);
         this.fills.set(f.id, { el, bar: b.id });
-        if (flyFrom) { Stage.setFill(el, f); moved.push({ el, from: flyFrom, row: r.row }); }
-        else if (still) Stage.setFill(el, f);
-        else { Stage.setFill(el, f); el.style.width = '0%'; grown.push({ el, f }); }
+        if (flyFrom) { Stage.setFill(el, f, b.parts); moved.push({ el, from: flyFrom, row: r.row }); }
+        else if (still) Stage.setFill(el, f, b.parts);
+        else { Stage.setFill(el, f, b.parts); el.style.width = '0%'; grown.push({ el, f }); }
       }
     }
 
@@ -409,16 +505,6 @@ class Stage {
     later.forEach(fn => fn());
   }
 }
-
-/* ---------- content ---------- */
-const UNITS = [
-  { id: 1, name: 'מה זה שבר', goal: 'מונה ומכנה, ולמה שמינית קטנה מרבע.' },
-  { id: 2, name: 'שברים שווים', goal: 'הרחבה וצמצום: אותה כמות בדיוק, רק חתוכה אחרת.' },
-  { id: 3, name: 'השלמה לשלם', goal: 'כמה חסר עד 1, וגם עד המספר השלם הבא.' },
-  { id: 4, name: 'חיבור שברים', goal: 'מכנה זהה, מכנה משותף, ומה קורה כשעוברים את השלם.' },
-  { id: 5, name: 'כפל שברים', goal: 'מספר שלם כפול שבר, ושבר "מתוך" שבר.' },
-  { id: 6, name: 'תרגול מעורב', goal: 'כל הנושאים יחד ובסדר מעורבב. כך הידע נשאר לאורך זמן.' }
-];
 
 const LESSONS = {
   1: [
@@ -483,376 +569,514 @@ const LESSONS = {
   })()
 };
 
-const WORKED = {
-  1: {
-    ex: { title: 'בכיתה 12 ילדים, ו־5 מהם בנות. איזה חלק מהכיתה הן בנות?', steps: ['השלם הוא כל הכיתה: 12 ילדים. לכן המכנה הוא 12.', 'החלק שמעניין אותנו: 5 בנות. לכן המונה הוא 5.', `התשובה: ${fr(5, 12)} מהכיתה הן בנות.`] },
-    faded: { title: 'בקופסה 9 עפרונות, ו־4 מהם אדומים. איזה חלק מהעפרונות אדום?', steps: ['השלם הוא כל הקופסה: 9 עפרונות. לכן המכנה הוא 9.', 'החלק שמעניין אותנו: העפרונות האדומים. לכן המונה הוא {box}.'], answer: 4, done: `התשובה: ${fr(4, 9)} מהעפרונות אדומים.`, wrong: 'המונה סופר את החלק שמעניין אותנו: כמה עפרונות אדומים יש?' },
-    why: { q: `למה ${fr(1, 8)} קטן מ־${fr(1, 4)}, אף ש־8 גדול מ־4?`, options: ['כי את אותו שלם חתכנו ליותר חלקים, אז כל חלק קטן יותר', 'כי שברים עם מספרים גדולים תמיד קטנים', 'כי המונים שווים'], correct: 0, explain: 'המכנה אומר לכמה חלקים חתכנו. יותר חלקים מאותו שלם = חלקים קטנים יותר.' }
-  },
-  2: {
-    ex: { title: `השלימו: ${M(fr(3, 4) + ' = ' + fr('?', 20))}`, steps: [`פי כמה גדל המכנה? מ־4 ל־20: פי 5, כי ${M('4 × 5 = 20')}.`, `מה שעשינו למכנה עושים גם למונה: ${M('3 × 5 = 15')}.`, `התשובה: ${M(fr(3, 4) + ' = ' + fr(15, 20))}.`] },
-    faded: { title: `השלימו: ${M(fr(2, 5) + ' = ' + fr('?', 15))}`, steps: [`פי כמה גדל המכנה? מ־5 ל־15: פי 3.`, `מה שעשינו למכנה עושים גם למונה: ${M('2 × 3 =')} {box}`], answer: 6, done: `התשובה: ${M(fr(2, 5) + ' = ' + fr(6, 15))}.`, wrong: 'מכפילים את המונה, 2, באותו מספר שבו הכפלנו את המכנה: 3.' },
-    why: { q: 'למה מותר להכפיל את המונה ואת המכנה באותו מספר?', options: ['כי זה כמו לחתוך כל חלק לאותו מספר חתיכות, והכמות הצבועה לא משתנה', 'כי כפל תמיד מגדיל, אז השבר גדל', 'כי מותר לעשות כל פעולה שעושים לשניהם'], correct: 0, explain: 'הרחבה היא רק חיתוך עדין יותר של אותה כמות. שימו לב: לחבר את אותו מספר למונה ולמכנה כן משנה את השבר.' }
-  },
-  3: {
-    ex: { title: `חשבו: ${M('1 − ' + fr(5, 9))}`, steps: [`כותבים את השלם בתשיעיות: ${M('1 = ' + fr(9, 9))}.`, `מחסירים חלקים באותו גודל: ${M('9 − 5 = 4')}.`, `התשובה: ${M('1 − ' + fr(5, 9) + ' = ' + fr(4, 9))}.`] },
-    faded: { title: `השלימו לשלם: ${M(fr(7, 10) + ' + ? = 1')}`, steps: [`כותבים את השלם בעשיריות: ${M('1 = ' + fr(10, 10))}.`, `כמה עשיריות חסרות? ${M('10 − 7 =')} {box}`], answer: 3, done: `התשובה: ${M(fr(7, 10) + ' + ' + fr(3, 10) + ' = 1')}.`, wrong: 'בשלם יש 10 עשיריות, ו־7 כבר יש לנו. כמה חסרות?' },
-    why: { q: `דנה אמרה: "כדי להשלים את ${fr(3, 8)} לשלם צריך ${fr(5, 8)}". איך הכי טוב לבדוק אותה?`, options: [`לחבר: ${M(fr(3, 8) + ' + ' + fr(5, 8) + ' = ' + fr(8, 8) + ' = 1')}`, 'לבדוק ש־5 גדול מ־3', 'לחבר את המכנים: 8 + 8 = 16'], correct: 0, explain: 'השלמה ובדיקה הן פעולות הפוכות: אם החיבור נותן שלם בדיוק, ההשלמה נכונה.' }
-  },
-  4: {
-    ex: { title: `חשבו: ${M(fr(1, 4) + ' + ' + fr(2, 3))}`, steps: ['מחפשים מכנה משותף: מספר ש־4 וגם 3 נכנסים בו. 12 מתאים.', `מרחיבים: ${M(fr(1, 4) + ' = ' + fr(3, 12))} ו־${M(fr(2, 3) + ' = ' + fr(8, 12))}.`, `מחברים חלקים באותו גודל: ${M(fr(3, 12) + ' + ' + fr(8, 12) + ' = ' + fr(11, 12))}.`] },
-    faded: { title: `חשבו: ${M(fr(1, 2) + ' + ' + fr(1, 5))}`, steps: ['מחפשים מכנה משותף: 2 וגם 5 נכנסים ב־10.', `מרחיבים: ${M(fr(1, 2) + ' = ' + fr(5, 10))} ו־${M(fr(1, 5) + ' = ' + fr(2, 10))}.`, `מחברים: ${M(fr(5, 10) + ' + ' + fr(2, 10) + ' = ')} {box} עשיריות`], answer: 7, done: `התשובה: ${M(fr(1, 2) + ' + ' + fr(1, 5) + ' = ' + fr(7, 10))}.`, wrong: 'החלקים כבר באותו גודל (עשיריות). כמה עשיריות יש יחד?' },
-    why: { q: 'למה בחיבור שברים לא מחברים את המכנים?', options: ['כי המכנה אומר מה גודל החלק, וחיבור לא משנה את גודל החלקים', 'כי ככה המורה אמרה', 'כי המכנה תמיד גדול מהמונה'], correct: 0, explain: '2 שביעיות ועוד 3 שביעיות הן 5 שביעיות, בדיוק כמו 2 תפוחים ועוד 3 תפוחים. ה"שביעיות" הן השם של החלק.' }
-  },
-  5: {
-    ex: { title: `חשבו: ${M(fr(2, 5) + ' × ' + fr(3, 4))}`, steps: [`מונה × מונה: ${M('2 × 3 = 6')}. כך סופרים את המשבצות בחפיפה.`, `מכנה × מכנה: ${M('5 × 4 = 20')}. לכמה משבצות נחתך השלם.`, `התשובה: ${M(fr(6, 20) + ' = ' + fr(3, 10))} אחרי צמצום.`] },
-    faded: { title: `חשבו: ${M('4 × ' + fr(2, 9))}`, steps: [`${M('4 × ' + fr(2, 9))} זה ${M(fr(2, 9) + ' + ' + fr(2, 9) + ' + ' + fr(2, 9) + ' + ' + fr(2, 9))}.`, `סופרים תשיעיות: ${M('4 × 2 =')} {box} תשיעיות`], answer: 8, done: `התשובה: ${M('4 × ' + fr(2, 9) + ' = ' + fr(8, 9))}. המכנה לא השתנה.`, wrong: 'בכל פעם יש 2 תשיעיות, ויש 4 פעמים כאלה.' },
-    why: { q: `למה ${M(fr(1, 2) + ' × ' + fr(1, 3))} קטן מ־${fr(1, 3)}?`, options: ['כי לוקחים רק חצי מתוך השליש', 'כי כפל תמיד מקטין', 'כי 2 × 3 = 6 גדול מ־3'], correct: 0, explain: 'כפל בשבר שקטן מ־1 פירושו "לקחת חלק מתוך". כפל במספר גדול מ־1 דווקא מגדיל.' }
-  }
+
+/* ---------- characters ---------- */
+function kobi(mood = 'happy') {
+  const mouth = mood === 'wow' ? '<ellipse cx="50" cy="71" rx="6" ry="7" fill="#3A1A0C"/>'
+    : mood === 'think' ? '<path d="M42 71 q8 -4 16 0" stroke="#3A1A0C" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    : '<path d="M38 66 q12 14 24 0" stroke="#3A1A0C" stroke-width="4.5" fill="#E8758F" stroke-linecap="round" stroke-linejoin="round"/>';
+  const brow = mood === 'think' ? '<path d="M56 46 l10 -4" stroke="#3A1A0C" stroke-width="3.5" stroke-linecap="round"/>' : '';
+  return `<svg class="kobi" viewBox="0 0 100 100" aria-hidden="true">
+    <ellipse cx="50" cy="94" rx="30" ry="4" fill="rgba(0,0,0,.12)"/>
+    <path d="M30 22 a12 12 0 0 1 14 -10 a14 14 0 0 1 24 2 a11 11 0 0 1 6 18 h-40 a10 10 0 0 1 -4 -10z" fill="#FFFFFF" stroke="#E2E2F0" stroke-width="2"/>
+    <rect x="31" y="27" width="40" height="8" rx="3" fill="#F2F2FA"/>
+    <rect x="14" y="32" width="72" height="58" rx="16" fill="#7B4529"/>
+    <rect x="14" y="32" width="72" height="58" rx="16" fill="none" stroke="#5C311C" stroke-width="3"/>
+    <path d="M50 36 v50 M18 61 h64" stroke="#5C311C" stroke-width="3" opacity=".55"/>
+    <rect x="20" y="37" width="24" height="5" rx="2.5" fill="#A0623D" opacity=".8"/>
+    <circle cx="38" cy="54" r="8" fill="#fff"/><circle cx="62" cy="54" r="8" fill="#fff"/>
+    <circle cx="39.5" cy="55" r="4" fill="#1E1030"/><circle cx="63.5" cy="55" r="4" fill="#1E1030"/>
+    <circle cx="41" cy="53.5" r="1.4" fill="#fff"/><circle cx="65" cy="53.5" r="1.4" fill="#fff"/>
+    <circle cx="28" cy="66" r="4.5" fill="#EE6E9F" opacity=".6"/><circle cx="72" cy="66" r="4.5" fill="#EE6E9F" opacity=".6"/>
+    ${brow}${mouth}</svg>`;
+}
+const SKIN = ['#F6D3B8', '#EAB892', '#CE9268', '#94603F', '#F3C9A6', '#6E4630'];
+const HAIR = ['#2A1A12', '#6B3B1F', '#E2A93B', '#B4462B', '#1E1E2A', '#8A5A3A'];
+const PASTEL = ['#C7F1E1', '#E2D9FF', '#FFDCC7', '#D3E6FF', '#FFEFAF', '#FFD3E3'];
+function avatar(s) {
+  const skin = SKIN[s % 6], hair = HAIR[(s >> 3) % 6], bg = PASTEL[(s >> 6) % 6], style = (s >> 9) % 4, extra = (s >> 11) % 3;
+  const hairSvg = [
+    `<path d="M14 34 a18 18 0 0 1 36 0 q-4 -9 -18 -9 q-14 0 -18 9z" fill="${hair}"/>`,
+    `<path d="M14 34 a18 18 0 0 1 36 0 q-4 -9 -18 -9 q-14 0 -18 9z" fill="${hair}"/><circle cx="12" cy="36" r="6" fill="${hair}"/><circle cx="52" cy="36" r="6" fill="${hair}"/>`,
+    `<g fill="${hair}"><circle cx="18" cy="22" r="7"/><circle cx="27" cy="16" r="8"/><circle cx="38" cy="16" r="8"/><circle cx="46" cy="23" r="7"/><circle cx="14" cy="31" r="5"/><circle cx="50" cy="31" r="5"/></g>`,
+    `<path d="M12 40 q-2 -26 20 -26 q22 0 20 26 l-4 -8 q-2 -12 -16 -12 q-14 0 -16 12z" fill="${hair}"/>`
+  ][style];
+  const acc = extra === 1 ? '<g fill="none" stroke="#24204A" stroke-width="2"><circle cx="25" cy="36" r="5"/><circle cx="39" cy="36" r="5"/><path d="M30 36h4"/></g>'
+    : extra === 2 ? `<path d="M15 24 q17 -14 34 0 l2 3 h-38z" fill="${['#4C6BFF', '#16A982', '#EE6E9F'][s % 3]}"/>` : '';
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="${bg}"/><path d="M12 64 q0 -14 20 -14 q20 0 20 14z" fill="${['#4C6BFF', '#EE6E9F', '#16A982', '#FFB23D'][s % 4]}"/>
+    <circle cx="32" cy="35" r="16" fill="${skin}"/>${hairSvg}
+    <circle cx="25.5" cy="36" r="2.2" fill="#24204A"/><circle cx="38.5" cy="36" r="2.2" fill="#24204A"/>${acc}
+    <circle cx="21" cy="42" r="3" fill="#EE6E9F" opacity=".35"/><circle cx="43" cy="42" r="3" fill="#EE6E9F" opacity=".35"/>
+    <path d="M27 43 q5 5 10 0" stroke="#24204A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+}
+const COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#FFC83D" stroke="#D99A00" stroke-width="2"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#D99A00" stroke-width="1.5"/><path d="M10 9.5 h4 M10 14.5 h4" stroke="#B87E00" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const star = on => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" fill="${on ? '#FFC83D' : 'var(--line)'}" stroke="${on ? '#D99A00' : 'none'}" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+const SCISSORS = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg>';
+const SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+const SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>';
+const mbar = (parts, a, b = 0, cls = '') => `<span class="mbar ${cls}" dir="rtl">${Array.from({ length: parts }, (_, i) => `<i class="${i < a ? 'a' : i < a + b ? 'b' : ''}"></i>`).join('')}</span>`;
+
+/* ---------- state ---------- */
+const KEY = 'fraclab-v2';
+let S = { coins: 0, stars: {}, race: 0, sound: true };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) S = { ...S, ...s }; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const starsTotal = () => [1, 2, 3, 4, 5].reduce((t, i) => t + (S.stars[i] || 0), 0);
+const $ = (s, r = document) => r.querySelector(s);
+
+/* ---------- sound ---------- */
+let AC = null;
+function tone(freqs, dur, type = 'triangle', vol = .07) {
+  if (!S.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + i * dur * .75;
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + .03);
+    });
+  } catch (e) {}
+}
+const sfx = {
+  tap: () => tone([620], .05, 'triangle', .035), ok: () => tone([660, 880, 1320], .11), bad: () => tone([260, 200], .16, 'sine', .06),
+  coin: () => tone([1480, 1980], .06, 'square', .02), win: () => tone([523, 659, 784, 1047], .15), cut: () => tone([300, 900], .04, 'sawtooth', .02)
 };
 
-/* ---------- practice generators ---------- */
-const sameVal = (x, n, d) => x.n * d === n * x.d;
-const GEN = {
+/* ---------- effects ---------- */
+const fx = $('#fx'); let parts = [], fxRun = false;
+function confetti(x, y, n = 70) {
+  if (REDUCE.matches) return;
+  const dpr = devicePixelRatio || 1; fx.width = innerWidth * dpr; fx.height = innerHeight * dpr;
+  const cols = ['#FFC83D', '#EE6E9F', '#7B4529', '#16A982', '#4C6BFF', '#A0623D'];
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, v = 4 + Math.random() * 8; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, r: Math.random() * 6.28, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 6, c: cols[i % cols.length], life: 90 + Math.random() * 40 }); }
+  if (!fxRun) { fxRun = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  const c = fx.getContext('2d'), dpr = devicePixelRatio || 1; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, innerWidth, innerHeight);
+  parts = parts.filter(p => p.life-- > 0 && p.y < innerHeight + 40);
+  for (const p of parts) { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; c.save(); c.translate(p.x, p.y); c.rotate(p.r); c.globalAlpha = Math.min(1, p.life / 30); c.fillStyle = p.c; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c.restore(); }
+  if (parts.length) requestAnimationFrame(tick); else { fxRun = false; c.clearRect(0, 0, innerWidth, innerHeight); }
+}
+function centerOf(el) { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
+function addCoins(n, fromEl) {
+  const target = $('#coinStat');
+  const done = () => { S.coins++; save(); $('#coins').textContent = S.coins; target.classList.remove('bump'); void target.offsetWidth; target.classList.add('bump'); sfx.coin(); };
+  if (!fromEl || REDUCE.matches) { for (let i = 0; i < n; i++) done(); return; }
+  const [x0, y0] = centerOf(fromEl), [x1, y1] = centerOf(target);
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('span'); c.className = 'flycoin'; c.innerHTML = COIN; c.style.left = (x0 - 13) + 'px'; c.style.top = (y0 - 13) + 'px'; document.body.appendChild(c);
+    const mx = (x0 + x1) / 2 + (i - 1) * 40, my = Math.min(y0, y1) - 60;
+    c.animate([{ transform: 'translate(0,0) scale(.6)' }, { transform: `translate(${mx - x0}px,${my - y0}px) scale(1.2)`, offset: .45 }, { transform: `translate(${x1 - x0}px,${y1 - y0}px) scale(.8)` }], { duration: 750, delay: i * 120, easing: 'cubic-bezier(.5,0,.4,1)', fill: 'both' }).onfinish = () => { c.remove(); done(); };
+  }
+}
+function floaty(el, text) { if (REDUCE.matches) return; const [x, y] = centerOf(el); const f = document.createElement('span'); f.className = 'floaty'; f.textContent = text; f.style.left = (x - 20) + 'px'; f.style.top = (y - 30) + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 1000); }
+
+/* ---------- stations ---------- */
+const STATIONS = [
+  { id: 1, name: 'מה זה שבר', goal: 'מונה, מכנה, ולמה שמינית קטנה מרבע.', band: 'var(--c1)', art: () => mbar(4, 3) },
+  { id: 2, name: 'שברים שווים', goal: 'אותה כמות שוקולד, חתוכה אחרת.', band: 'var(--c2)', art: () => `<span class="artstack">${mbar(2, 1, 0, 'sm')}${mbar(6, 3, 0, 'sm')}</span>` },
+  { id: 3, name: 'השלמה לשלם', goal: 'כמה חסר עד חפיסה שלמה?', band: 'var(--c3)', art: () => mbar(5, 3, 2) },
+  { id: 4, name: 'חיבור שברים', goal: 'מכנה משותף, וחתיכות שעוברות חפיסה.', band: 'var(--c4)', art: () => `<span class="artstack">${mbar(6, 3, 0, 'sm')}${mbar(6, 0, 2, 'sm')}</span>` },
+  { id: 5, name: 'כפל שברים', goal: 'כמה פעמים שבר, ושבר "מתוך" שבר.', band: 'var(--c5)', art: () => `<span class="mgrid" style="grid-template-columns:repeat(4,1fr)">${Array.from({ length: 12 }, (_, i) => { const r = Math.floor(i / 4), c = i % 4; const a = c < 3, b = r < 2; return `<i class="${a && b ? 'ab' : a ? 'a' : b ? 'b' : ''}"></i>`; }).join('')}</span>` }
+];
+
+const RECIPE = {
+  1: { rule: 'המכנה (למטה) אומר לכמה חלקים <b>שווים</b> חתכנו. המונה (למעלה) סופר כמה חלקים לקחנו.' },
+  2: { rule: 'מכפילים, או מחלקים, את המונה ואת המכנה <b>באותו מספר</b>, והשבר נשאר אותה כמות.' },
+  3: { rule: `בשלם יש בדיוק כמה חלקים שהמכנה אומר: ${M('1 = ' + fr(8, 8))}. כדי לדעת כמה חסר, מחסירים מונים.` },
+  4: { rule: 'מחברים רק חלקים <b>באותו גודל</b>: מביאים למכנה משותף, ואז מחברים את המונים. המכנה לא משתנה.' },
+  5: { rule: 'מספר שלם × שבר: כופלים רק את המונה. שבר × שבר: מונה × מונה, ומכנה × מכנה.' }
+};
+const EXAMPLES = {
+  1: { title: 'בכיתה 12 ילדים, ו־5 מהם בנות. איזה חלק מהכיתה הן בנות?', steps: ['השלם הוא כל הכיתה: 12 ילדים, ולכן המכנה 12.', 'החלק שמעניין אותנו הוא 5 בנות, ולכן המונה 5.', `התשובה: ${fr(5, 12)} מהכיתה.`] },
+  2: { title: `${M(fr(3, 4) + ' = ' + fr('?', 20))}`, steps: [`פי כמה גדל המכנה? ${M('4 × 5 = 20')}, כלומר פי 5.`, `גם המונה גדל פי 5: ${M('3 × 5 = 15')}.`, `${M(fr(3, 4) + ' = ' + fr(15, 20))}`] },
+  3: { title: `${M('1 − ' + fr(5, 9))}`, steps: [`כותבים את השלם בתשיעיות: ${M('1 = ' + fr(9, 9))}.`, `מחסירים: ${M('9 − 5 = 4')}.`, `${M('1 − ' + fr(5, 9) + ' = ' + fr(4, 9))}`] },
+  4: { title: `${M(fr(1, 4) + ' + ' + fr(2, 3))}`, steps: ['מכנה משותף: 4 וגם 3 נכנסים ב־12.', `${M(fr(1, 4) + ' = ' + fr(3, 12))} ו־${M(fr(2, 3) + ' = ' + fr(8, 12))}`, `${M(fr(3, 12) + ' + ' + fr(8, 12) + ' = ' + fr(11, 12))}`] },
+  5: { title: `${M(fr(2, 5) + ' × ' + fr(3, 4))}`, steps: [`מונה × מונה: ${M('2 × 3 = 6')}`, `מכנה × מכנה: ${M('5 × 4 = 20')}`, `${M(fr(6, 20) + ' = ' + fr(3, 10))} אחרי צמצום`] }
+};
+
+/* ---------- option builders ---------- */
+const eqv = (a, b) => a[0] * b[1] === b[0] * a[1];
+function fopts(ans, cands) {
+  const out = [{ f: ans, ok: true }];
+  for (const [n, d, why] of cands) {
+    if (out.length >= 3) break;
+    if (!(d > 0) || n < 0 || !Number.isInteger(n) || !Number.isInteger(d)) continue;
+    if (out.some(o => eqv(o.f, [n, d]))) continue;
+    out.push({ f: [n, d], ok: false, why });
+  }
+  let g = 0;
+  while (out.length < 3 && g++ < 40) {
+    const n = Math.max(1, ans[0] + ri(-2, 2)), d = Math.max(2, ans[1] + pick([0, 0, 1, -1]));
+    if (!out.some(o => eqv(o.f, [n, d]))) out.push({ f: [n, d], ok: false, why: 'כמעט. ספרו שוב את החלקים.' });
+  }
+  return shuffle(out.map(o => ({ h: fr(o.f[0], o.f[1]), ok: o.ok, why: o.why })));
+}
+const knifeOpts = (vals, correct, why) => shuffle([...new Set(vals)].slice(0, 3).map(v => ({ h: `${SCISSORS}<span>${typeof v === 'number' ? v : v}</span>`, v, ok: v === correct, why: why(v) })));
+const NAMES = ['נועה', 'איתי', 'מאיה', 'יואב', 'תמר', 'עומר', 'ליה', 'אריאל', 'שירה', 'עידו', 'רוני', 'אלמה', 'גיא', 'הדר', 'נגה', 'יונתן'];
+
+/* ---------- orders (mini-games) ---------- */
+const ORDERS = {
   1: [
-    () => { const d = ri(3, 10), n = ri(1, d - 1); return { type: 'frac', prompt: 'איזה חלק מהמלבן צבוע?', eq: E('{box}'), ans: [n, d], visual: { bars: [B('v', d, [F('v1', 0, n / d)])] },
-      hints: ['כמה חלקים שווים יש בסך הכל? זה המכנה.', 'כמה מהם צבועים? זה המונה.'],
-      diagnose: x => x.n === d && x.d === n ? `הפכתם. המכנה (למטה) הוא מספר כל החלקים, כאן ${d}.` : x.n === n && x.d === d - n ? 'המכנה הוא מספר <b>כל</b> החלקים, לא רק הלבנים.' : x.n === d - n && x.d === d ? 'ספרתם את החלקים הלבנים. המונה סופר את הצבועים.' : null,
-      solve: { html: `יש ${d} חלקים שווים (המכנה), ו־${n} מהם צבועים (המונה): ${fr(n, d)}.`, scenes: [{ bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] }] } }; },
-    () => { const d = ri(3, 9), n = ri(1, d - 1); return { type: 'shade', parts: d, ans: n, prompt: `צבעו ${fr(n, d)} מהמלבן. לחצו על חלקים כדי לצבוע אותם.`,
-      hints: [`המלבן כבר חתוך ל־${d} חלקים, כמו המכנה.`, `המונה אומר כמה חלקים לצבוע: ${n}.`],
-      diagnose: c => c === d - n ? 'צבעתם את מה שנשאר. המונה אומר כמה לצבוע.' : null,
-      solve: { html: `המכנה ${d}: המלבן חתוך ל־${d}. המונה ${n}: צובעים ${n} חלקים.` } }; },
-    () => { let a = ri(2, 10), b; do { b = ri(2, 10); } while (b === a); const n = ri(1, Math.min(3, Math.min(a, b) - 1)); return { type: 'choice', prompt: 'איזה שבר גדול יותר?', options: [fr(n, a), fr(n, b)], ans: a < b ? 0 : 1,
-      hints: ['המונים שווים, אז משווים את גודל החלקים.', 'מכנה גדול יותר = חלקים קטנים יותר.'],
-      diagnose: () => 'במכנה הגדול חתכנו את השלם ליותר חלקים, ולכן כל חלק קטן יותר.',
-      solve: { html: `${fr(n, Math.min(a, b))} גדול יותר: באותו מספר חלקים, החלקים שלו גדולים יותר.`, scenes: [{ bars: [B('c1', a, [F('ca', 0, n / a)], fr(n, a)), B('c2', b, [F('cb', 0, n / b, 'b')], fr(n, b))] }] } }; }
+    () => { const d = ri(2, 8), n = ri(1, d - 1); return { say: `שלום! אפשר בבקשה ${fr(n, d)} מחפיסת השוקולד?`, steps: [{ kind: 'cut', d, n, q: 'חותכים את החפיסה ולוקחים את החלקים להזמנה' }],
+      hint: `המכנה (${d}) אומר לכמה חלקים לחתוך. המונה (${n}) אומר כמה חלקים לקחת.`, explain: `חתכנו ל־${d} חלקים שווים ולקחנו ${n}: ${fr(n, d)}.` }; },
+    () => { const d = ri(3, 9), n = ri(1, d - 1); return { say: 'זה מה שנשאר לי מהחפיסה. איזה שבר זה?', scene: { bars: [B('v', d, [F('v1', 0, n / d)])] },
+      steps: [{ kind: 'pick', q: 'בחרו את השבר', opts: fopts([n, d], [[d, n, `הפכתם: המכנה (למטה) הוא מספר כל החלקים, ${d}.`], [d - n, d, 'ספרתם את החלקים הריקים. המונה סופר את השוקולד.'], [n, d - n, 'המכנה סופר את <b>כל</b> החלקים, גם את הריקים.']]), then: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] } }],
+      hint: 'ספרו את כל החלקים (מכנה), ואת חלקי השוקולד (מונה).', explain: `${d} חלקים בחפיסה, ${n} מהם שוקולד: ${fr(n, d)}.` }; },
+    () => { let a = ri(2, 9), b; do { b = ri(2, 9); } while (b === a); const n = ri(1, Math.min(3, Math.min(a, b) - 1)), big = Math.min(a, b);
+      return { say: `על צלחת אחת יש ${fr(n, a)} חפיסה, ועל השנייה ${fr(n, b)} חפיסה. איזו צלחת נותנת <b>יותר</b> שוקולד?`,
+        steps: [{ kind: 'pick', q: 'בוחרים צלחת', opts: [{ h: fr(n, a), ok: a < b, why: 'מכנה גדול = חתכנו ליותר חלקים, אז כל חלק קטן יותר.' }, { h: fr(n, b), ok: b < a, why: 'מכנה גדול = חתכנו ליותר חלקים, אז כל חלק קטן יותר.' }], then: { bars: [B('c1', a, [F('ca', 0, n / a)], fr(n, a)), B('c2', b, [F('cb', 0, n / b, 'b')], fr(n, b))] } }],
+        hint: 'באותו מספר חלקים, מה עדיף: חלקים גדולים או קטנים? ומתי החלקים גדולים?', explain: `${fr(n, big)} נותן יותר: את החפיסה שלו חתכו לפחות חלקים, אז כל חלק גדול יותר.` }; }
   ],
   2: [
-    () => { const d = ri(2, 6), n = ri(1, d - 1), k = ri(2, 5), D = d * k; return { type: 'num', prompt: 'השלימו את המונה החסר:', eq: E(fr(n, d), OP.eq, fr('{box}', D)), ans: n * k, visual: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] },
-      hints: [`פי כמה גדל המכנה? ${M(d + ' → ' + D)}.`, `הכפילו גם את המונה פי ${k}.`],
-      diagnose: x => x === n + (D - d) ? `הוספתם ${D - d} למונה. בשברים שווים <b>מכפילים</b>: המכנה גדל פי ${k}, אז גם המונה.` : null,
-      solve: { html: `${M(d + ' × ' + k + ' = ' + D)}, ולכן גם ${M(n + ' × ' + k + ' = ' + n * k)}: ${M(fr(n, d) + ' = ' + fr(n * k, D))}. בציור כל חלק נחתך ל־${k}.`, scenes: [{ bars: [B('v', D, [F('v1', 0, n / d)], fr(n * k, D))] }] } }; },
-    () => { const d = ri(2, 7), n = coprime(d), k = ri(2, 4), askTop = Math.random() < .5; return { type: 'num', prompt: 'צמצמו: השלימו את המספר החסר.', eq: E(fr(n * k, d * k), OP.eq, askTop ? fr('{box}', d) : fr(n, '{box}')), ans: askTop ? n : d, visual: { bars: [B('v', d * k, [F('v1', 0, n / d)], fr(n * k, d * k))] },
-      hints: [askTop ? `פי כמה קטן המכנה? ${M(d * k + ' → ' + d)}.` : `פי כמה קטן המונה? ${M(n * k + ' → ' + n)}.`, `מחלקים את השני באותו מספר: ${k}.`],
-      diagnose: x => x === (askTop ? n * k - (d * k - d) : d * k - (n * k - n)) ? 'הפחתתם את אותו מספר. בצמצום <b>מחלקים</b> את שניהם באותו מספר.' : null,
-      solve: { html: `מחלקים את המונה ואת המכנה ב־${k}: ${M(fr(n * k, d * k) + ' = ' + fr(n, d))}. כל ${k} חתיכות מתאחדות לחלק אחד.`, scenes: [{ bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] }] } }; },
-    () => { const d = ri(2, 6), n = ri(1, d - 1), k = ri(2, 4), truth = Math.random() < .5, n2 = truth ? n * k : n + k, d2 = truth ? d * k : d + k; return { type: 'choice', prompt: `האם ${M(fr(n, d) + ' = ' + fr(n2, d2))}?`, options: ['כן, הם שווים', 'לא, הם שונים'], ans: truth ? 0 : 1, txt: true,
-      hints: ['בדקו: האם המונה והמכנה גדלו <b>פי</b> אותו מספר?', truth ? `${M(n + ' × ' + k + ' = ' + n2)} ו־${M(d + ' × ' + k + ' = ' + d2)}` : `מ־${d} ל־${d2}: האם זה כפל?`],
-      diagnose: () => truth ? `גם המונה וגם המכנה הוכפלו פי ${k}, אז השברים שווים.` : `הוספנו ${k} למונה ולמכנה. הוספה משנה את השבר. רק כפל (או חילוק) באותו מספר שומר עליו.`,
-      solve: { html: truth ? `שווים: מונה ומכנה הוכפלו פי ${k}. בציור הצבע מגיע לאותו מקום.` : `שונים: הוספה של ${k} לשניהם משנה את השבר. בציור הצבע לא מגיע לאותו מקום.`, scenes: [{ bars: [B('c1', d, [F('ca', 0, n / d)], fr(n, d)), B('c2', d2, [F('cb', 0, n2 / d2, 'b')], fr(n2, d2))] }] } }; }
+    () => { const d = ri(2, 5), n = ri(1, d - 1), k = ri(2, 4), D = d * k;
+      return { say: `יש לי ${fr(n, d)} חפיסה, אבל החתיכות גדולות מדי. אפשר לחתוך כך שיהיו ${D} חתיכות בכל החפיסה?`, scene: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] },
+        steps: [
+          { kind: 'pick', style: 'knife', q: 'כל חלק חותכים ל...', opts: knifeOpts(shuffle([k, k + 1, k === 2 ? 4 : k - 1, k + 2]).filter((v, i, a) => a.indexOf(v) === i).sort((x, y) => (y === k) - (x === k)), k, v => `כל חלק ל־${v} נותן ${M(d + ' × ' + v + ' = ' + d * v)} חתיכות, לא ${D}.`).map(o => ({ ...o, h: `${SCISSORS}<span>${o.v}</span>` })), then: { bars: [B('v', D, [F('v1', 0, n / d)], '?')] } },
+          { kind: 'pick', q: 'כמה מהחפיסה יש עכשיו?', opts: fopts([n * k, D], [[n + (D - d), D, `הוספתם במקום להכפיל. כל חתיכת שוקולד נחתכה ל־${k}.`], [n, D, `גם חתיכות השוקולד נחתכו: ${M(n + ' × ' + k)}.`], [n * k, d, `גם המכנה גדל: עכשיו יש ${D} חתיכות.`]]), then: { bars: [B('v', D, [F('v1', 0, n / d)], fr(n * k, D))] } }],
+        hint: `כמה פעמים ${d} נכנס ב־${D}? בזה צריך לחתוך כל חלק.`, explain: `${M(fr(n, d) + ' = ' + fr(n * k, D))}: גם המונה וגם המכנה הוכפלו פי ${k}. אותה כמות שוקולד!` }; },
+    () => { const pool = shuffle([[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [5, 6]]); const chosen = []; for (const p of pool) { if (chosen.length < 4 && !chosen.some(c => eqv(c, p))) chosen.push(p); }
+      const cards = shuffle(chosen.flatMap(([n, d], i) => { const k = d <= 3 ? ri(2, 3) : 2; return [{ id: i, h: fr(n, d) }, { id: i, h: `${mbar(d * k, n * k)}<small>${M(fr(n * k, d * k))}</small>` }]; }));
+      return { say: 'משחק זיכרון! מצאו זוגות של שברים ששווים זה לזה.', steps: [{ kind: 'memory', cards, q: 'הפכו שני קלפים בכל פעם' }],
+        hint: 'בקלף עם הציור, בדקו לאיזה שבר פשוט הוא שווה: למשל, חצי מהחפיסה צבוע?', explain: 'כל זוג הוא אותה כמות שוקולד, חתוכה לחתיכות בגודל אחר.' }; },
+    () => { const d = ri(2, 6), n = coprime(d), k = ri(2, 4);
+      return { say: `כמה חתיכות קטנות! איך כותבים ${fr(n * k, d * k)} בצורה הכי פשוטה?`, scene: { bars: [B('v', d * k, [F('v1', 0, n / d)], fr(n * k, d * k))] },
+        steps: [{ kind: 'pick', q: 'בחרו את השבר המצומצם', opts: fopts([n, d], [[n, d * k, 'צמצמתם רק את המונה. מחלקים את <b>שניהם</b> באותו מספר.'], [n * k, d, 'צמצמתם רק את המכנה. מחלקים את <b>שניהם</b> באותו מספר.'], [n * k - 1, d * k - 1, 'הפחתה משנה את השבר. בצמצום מחלקים.']]), then: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] } }],
+        hint: `באיזה מספר אפשר לחלק גם את ${n * k} וגם את ${d * k}?`, explain: `מחלקים את המונה ואת המכנה ב־${k}: ${M(fr(n * k, d * k) + ' = ' + fr(n, d))}. כל ${k} חתיכות התאחדו לחלק אחד.` }; }
   ],
   3: [
-    () => { const d = ri(3, 12), n = ri(1, d - 1); return { type: 'num', prompt: 'כמה חסר כדי להגיע לשלם?', eq: E(fr(n, d), OP.plus, fr('{box}', d), OP.eq, 1), ans: d - n, visual: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] },
-      hints: [`בשלם יש ${d} חלקים כאלה.`, `${M(d + ' − ' + n + ' = ?')}`],
-      diagnose: x => x === n ? 'זה מה שכבר יש. כמה חלקים <b>חסרים</b>?' : x === d ? `בשלם יש ${d} חלקים, אבל ${n} מהם כבר צבועים.` : null,
-      solve: { html: `${M('1 = ' + fr(d, d))}, ו־${M(d + ' − ' + n + ' = ' + (d - n))}. חסרים ${fr(d - n, d)}.`, scenes: [{ bars: [B('v', d, [F('v1', 0, n / d), F('v2', n / d, 1, 'b')], N(1))] }] } }; },
-    () => { const d = ri(3, 12), n = ri(1, d - 1); return { type: 'frac', prompt: 'חשבו:', eq: E(1, OP.minus, fr(n, d), OP.eq, '{box}'), ans: [d - n, d], visual: { bars: [B('v', d, [F('v1', 0, 1)], N(1))] },
-      hints: [`כתבו את 1 כשבר עם מכנה ${d}: ${fr(d, d)}.`, `${M(fr(d, d) + ' − ' + fr(n, d))}: מחסירים רק את המונים.`],
-      diagnose: x => x.n === d - n && x.d !== d ? `המכנה נשאר ${d}: מחסירים חלקים באותו גודל.` : x.n === n && x.d === d ? 'זה החלק שהורדנו. כמה <b>נשאר</b>?' : null,
-      solve: { html: `${M('1 − ' + fr(n, d) + ' = ' + fr(d, d) + ' − ' + fr(n, d) + ' = ' + fr(d - n, d))}.`, scenes: [{ bars: [B('v', d, [F('v1', 0, (d - n) / d), F('v2', (d - n) / d, 1, 'x')], fr(d - n, d))] }] } }; },
-    () => { const w = ri(1, 3), d = ri(2, 8), n = ri(1, d - 1); const bars = []; for (let i = 0; i < w; i++) bars.push(B('w' + i, 1, [F('wf' + i, 0, 1)], N(1), { size: 'sm' }));
-      return { type: 'num', prompt: `כמה חסר כדי להגיע ל־${w + 1}?`, eq: E(mx(w, n, d), OP.plus, fr('{box}', d), OP.eq, w + 1), ans: d - n, visual: { bars: [...bars, B('v', d, [F('v1', 0, n / d)], fr(n, d), { size: 'sm' })] },
-        hints: ['השלמים כבר מלאים. מסתכלים רק על השבר.', `כמה חסר ל־${fr(n, d)} כדי להיות שלם?`],
-        diagnose: x => x === n ? 'זה מה שכבר יש בחפיסה האחרונה. כמה חסר בה?' : null,
-        solve: { html: `השלמים לא משתנים. ל־${fr(n, d)} חסרים ${fr(d - n, d)} כדי להיות שלם.`, scenes: [{ bars: [...bars, B('v', d, [F('v1', 0, n / d), F('v2', n / d, 1, 'b')], N(1), { size: 'sm' })] }] } }; }
+    () => { const d = ri(3, 10), n = ri(1, d - 1); return { say: 'כמה חסר לי כדי שתהיה לי חפיסה שלמה?', scene: { bars: [B('v', d, [F('v1', 0, n / d)], fr(n, d))] },
+      steps: [{ kind: 'pick', q: 'כמה חסר עד השלם?', opts: fopts([d - n, d], [[n, d, 'זה מה שכבר יש. כמה <b>חסר</b>?'], [d - n, n, `המכנה נשאר ${d}: גודל החלק לא משתנה.`], [1, d, 'ספרו את <b>כל</b> החלקים הריקים.']]), then: { bars: [B('v', d, [F('v1', 0, n / d), F('v2', n / d, 1, 'b')], N(1))] } }],
+      hint: `בחפיסה שלמה יש ${d} חלקים. כמה מהם ריקים?`, explain: `${M(fr(n, d) + ' + ' + fr(d - n, d) + ' = ' + fr(d, d) + ' = 1')}` }; },
+    () => { const d = ri(3, 12), n = ri(1, d - 1); return { say: `יש לי ${fr(n, d)} עוגה. כמה חסר לעוגה שלמה?`,
+      steps: [{ kind: 'pick', q: 'בלי ציור הפעם. דמיינו!', opts: fopts([d - n, d], [[n, d, 'זה מה שכבר יש. כמה <b>חסר</b>?'], [d - n, n, `המכנה נשאר ${d}.`], [d, d - n, 'הפכתם מונה ומכנה.']]), then: { bars: [B('v', d, [F('v1', 0, n / d), F('v2', n / d, 1, 'b')], N(1))] } }],
+      hint: `${M('1 = ' + fr(d, d))}. כמה חלקים חסרים ל־${n}?`, explain: `${M('1 − ' + fr(n, d) + ' = ' + fr(d - n, d))}` }; },
+    () => { const w = ri(1, 3), d = ri(2, 8), n = ri(1, d - 1); const wb = Array.from({ length: w }, (_, i) => B('w' + i, 1, [F('wf' + i, 0, 1)], N(1), { size: 'sm' }));
+      return { say: `יש לי ${mx(w, n, d)} חפיסות. כמה חסר כדי שיהיו לי ${w + 1} שלמות?`, scene: { bars: [...wb, B('v', d, [F('v1', 0, n / d)], fr(n, d), { size: 'sm' })] },
+        steps: [{ kind: 'pick', q: 'כמה חסר?', opts: fopts([d - n, d], [[n, d, 'זה מה שיש בחפיסה האחרונה. כמה <b>חסר</b> בה?'], [w + 1 - 1, d, 'השלמים כבר מלאים. מסתכלים רק על החפיסה האחרונה.'], [d - n, d * (w + 1), `המכנה נשאר ${d}.`]]), then: { bars: [...wb, B('v', d, [F('v1', 0, n / d), F('v2', n / d, 1, 'b')], N(1), { size: 'sm' })] } }],
+        hint: 'השלמים לא צריכים כלום. כמה חסר בחפיסה הלא־מלאה?', explain: `${M(mx(w, n, d) + ' + ' + fr(d - n, d) + ' = ' + (w + 1))}` }; }
   ],
   4: [
-    () => { const d = ri(4, 12), a = ri(1, d - 2), c = ri(1, d - 1 - a), s = sumScenes(a, d, c, d); return { type: 'frac', prompt: 'חשבו:', eq: E(fr(a, d), OP.plus, fr(c, d), OP.eq, '{box}'), ans: [a + c, d], visual: s.s0,
-      hints: ['המכנים שווים, אז החלקים באותו גודל.', 'מחברים את המונים. המכנה נשאר.'],
-      diagnose: x => x.n === a + c && x.d === 2 * d ? `חיברתם גם את המכנים. גודל החלק לא משתנה כשמחברים, אז המכנה נשאר ${d}.` : null,
-      solve: { html: `${M(a + ' + ' + c + ' = ' + (a + c))} חלקים בגודל ${fr(1, d)}: ${fr(a + c, d)}.`, scenes: [s.s2] } }; },
-    () => { const [p, q] = pick([[2, 4], [2, 6], [3, 6], [2, 8], [4, 8], [3, 9], [5, 10], [2, 10], [3, 12], [4, 12]]); const a = ri(1, p - 1), c = ri(1, q - 1); const swap = Math.random() < .5; const [x1, y1, x2, y2] = swap ? [c, q, a, p] : [a, p, c, q]; const s = sumScenes(x1, y1, x2, y2); const n = a * q / p + c;
-      return { type: 'frac', prompt: 'חשבו:', eq: E(fr(x1, y1), OP.plus, fr(x2, y2), OP.eq, '{box}'), ans: [n, q], visual: s.s0,
-        hints: [`האם ${p} נכנס ב־${q}? אז ${q} יכול להיות מכנה משותף.`, `${M(fr(a, p) + ' = ' + fr(a * q / p, q))}`],
-        diagnose: x => x.n === a + c && x.d === p + q ? 'חיברתם מונים ומכנים. קודם מביאים למכנה משותף, ואז מחברים רק מונים.' : (x.n === a + c && x.d === q) ? `צריך קודם להרחיב את ${fr(a, p)} ל־${q}־יות. כמה זה?` : null,
-        solve: { html: `${M(fr(a, p) + ' = ' + fr(a * q / p, q))}, ואז ${M(fr(a * q / p, q) + ' + ' + fr(c, q) + ' = ' + fr(n, q))}.`, scenes: [s.s1, s.s2] } }; },
-    () => { const [p, q] = pick([[2, 3], [2, 5], [3, 4], [3, 5], [2, 7], [4, 5]]); const a = ri(1, p - 1), c = ri(1, q - 1); const L = p * q, n = a * q + c * p; const s = sumScenes(a, p, c, q);
-      return { type: 'frac', prompt: 'חשבו:', eq: E(fr(a, p), OP.plus, fr(c, q), OP.eq, '{box}'), ans: [n, L], visual: s.s0,
-        hints: [`מכנה משותף: מספר ש־${p} וגם ${q} נכנסים בו. נסו ${L}.`, `${M(fr(a, p) + ' = ' + fr(a * q, L))} ו־${M(fr(c, q) + ' = ' + fr(c * p, L))}`],
-        diagnose: x => x.n === a + c && x.d === p + q ? 'חיברתם מונים ומכנים. החלקים בגודל שונה. קודם חותכים לגודל משותף.' : null,
-        solve: { html: `מכנה משותף ${L}: ${M(fr(a * q, L) + ' + ' + fr(c * p, L) + ' = ' + fr(n, L))}${n > L ? ` = ${mx(Math.floor(n / L), n % L, L)}` : ''}.`, scenes: [s.s1, s.s2] } }; }
+    () => { const d = ri(4, 10), a = ri(1, d - 1), c = ri(1, Math.min(d - 1, d + 2 - a)), s = sumScenes(a, d, c, d);
+      return { say: `אני רוצה ${fr(a, d)} חפיסת חלב ועוד ${fr(c, d)} חפיסת תות. כמה זה ביחד?`, scene: s.s0,
+        steps: [{ kind: 'pick', q: 'כמה שוקולד ביחד?', opts: fopts([a + c, d], [[a + c, 2 * d, `חיברתם גם את המכנים. גודל החלק לא השתנה, אז המכנה נשאר ${d}.`], [a * c, d, 'זה חיבור, לא כפל.'], [a + c + 1, d, 'ספרו שוב את החתיכות.']]), then: s.s2 }],
+        hint: 'החלקים באותו גודל. סופרים כמה חתיכות יש ביחד.', explain: `${M(fr(a, d) + ' + ' + fr(c, d) + ' = ' + fr(a + c, d))}${a + c > d ? ' = ' + nice(a + c, d) : ''}. המכנה לא משתנה.` }; },
+    () => { const [p, q] = pick([[2, 4], [2, 6], [3, 6], [2, 8], [4, 8], [3, 9], [2, 3], [2, 5], [3, 4], [3, 5], [4, 6], [6, 8]]); const a = ri(1, p - 1), c = ri(1, q - 1), L = lcm(p, q), A = a * L / p, C = c * L / q, s = sumScenes(a, p, c, q);
+      const wrongs = [p + q, Math.max(p, q) === L ? L + 1 : Math.max(p, q), L * 2 === p + q ? L + 2 : (L + 1), p * q === L ? L - 1 : p * q].filter(v => v !== L && !(v % p === 0 && v % q === 0) && v > 1);
+      return { say: `אפשר ${fr(a, p)} חפיסת חלב ועוד ${fr(c, q)} חפיסת תות, באותה קופסה?`, scene: s.s0,
+        steps: [
+          { kind: 'pick', style: 'knife', q: 'החלקים בגודל שונה. לכמה חלקים לחתוך את שתי החפיסות?', opts: knifeOpts([L, ...wrongs], L, v => `${v} לא מתחלק גם ב־${p} וגם ב־${q}. צריך מספר ששני המכנים נכנסים בו.`), then: s.s1 },
+          { kind: 'pick', q: 'כמה זה ביחד?', opts: fopts([A + C, L], [[a + c, p + q, 'חיברתם מונים ומכנים. המכנה המשותף נשאר.'], [a + c, L, `צריך קודם להרחיב: ${M(fr(a, p) + ' = ' + fr(A, L))}.`], [A + C, 2 * L, `המכנה נשאר ${L}.`]]), then: s.s2 }],
+        hint: `חפשו מספר ש־${p} וגם ${q} נכנסים בו בדיוק.`, explain: `${M(fr(A, L) + ' + ' + fr(C, L) + ' = ' + fr(A + C, L))}${A + C > L ? ' = ' + nice(A + C, L) : ''}` }; }
   ],
   5: [
-    () => { const d = ri(3, 8), n = ri(1, Math.min(3, d - 1)); let k = ri(2, 4); while (k * n > 3 * d) k--; const m = mulWhole(k, n, d);
-      return { type: 'frac', prompt: 'חשבו:', eq: E(k, OP.times, fr(n, d), OP.eq, '{box}'), ans: [k * n, d], visual: m.before,
-        hints: [`${M(k + ' × ' + fr(n, d))} זה ${fr(n, d)} ועוד ${fr(n, d)}... ${k} פעמים.`, `כמה ${d === 2 ? 'חצאים' : 'חלקים'} יש בסך הכל? המכנה לא משתנה.`],
-        diagnose: x => x.n === k * n && x.d === k * d ? `הכפלתם גם את המכנה. ${M(k + ' × ' + fr(n, d))} זה חיבור של ${k} פעמים ${fr(n, d)}, וגודל החלק לא משתנה.` : null,
-        solve: { html: `${M(k + ' × ' + n + ' = ' + k * n)}, והחלק נשאר ${fr(1, d)}: ${fr(k * n, d)}${k * n > d ? ` = ${nice(k * n, d)}` : ''}.`, scenes: [m.after] } }; },
-    () => { const d1 = ri(2, 5), n1 = ri(1, d1 - 1), d2 = ri(2, 6), n2 = ri(1, d2 - 1);
-      return { type: 'frac', prompt: 'חשבו:', eq: E(fr(n1, d1), OP.times, fr(n2, d2), OP.eq, '{box}'), ans: [n1 * n2, d1 * d2], visual: AREA(d2, n2),
-        hints: [`חושבים: ${fr(n1, d1)} <b>מתוך</b> ${fr(n2, d2)}.`, 'מונה × מונה, ומכנה × מכנה.'],
-        diagnose: x => x.n === n1 + n2 && x.d === d1 + d2 ? 'חיברתם. בכפל: מונה × מונה ומכנה × מכנה.' : (x.n === n1 * n2 && x.d === d2) || (x.n === n1 * n2 && x.d === d1) ? 'המונה נכון. גם את המכנים כופלים: לכמה משבצות נחתך הריבוע?' : null,
-        solve: { html: `${M(n1 + ' × ' + n2 + ' = ' + n1 * n2)} משבצות בחפיפה, מתוך ${M(d1 + ' × ' + d2 + ' = ' + d1 * d2)}: ${fr(n1 * n2, d1 * d2)}${gcd(n1 * n2, d1 * d2) > 1 ? ' = ' + nice(n1 * n2, d1 * d2) : ''}.`, scenes: [AREA(d2, n2, d1, n1, true)] } }; },
-    () => { const [u, uw] = pick([[2, 'חצי'], [3, 'שליש'], [4, 'רבע']]); const d = ri(2, 6), c = ri(1, d - 1); const item = pick([['עוגה', 'נשארו', 'אכלה', 'נועה'], ['פיצה', 'נשארו', 'אכל', 'יואב'], ['גינה', 'שתלו פרחים ב־', 'השקתה', 'מאיה']]);
-      const story = item[0] === 'גינה' ? `שתלו פרחים ב־${fr(c, d)} מהגינה. ${item[3]} השקתה ${uw} מהחלק עם הפרחים. איזה חלק מכל הגינה היא השקתה?` : `${item[1]} ${fr(c, d)} מה${item[0]}. ${item[3]} ${item[2]} ${uw} ממה שנשאר. איזה חלק מכל ה${item[0]} ${item[2]}?`;
-      return { type: 'frac', prompt: story, eq: E(fr(1, u), OP.times, fr(c, d), OP.eq, '{box}'), ans: [c, u * d], visual: AREA(d, c),
-        hints: [`"${uw} מתוך" זה כפל ב־${fr(1, u)}.`, 'חותכים את הריבוע לרוחב ולוקחים שורה אחת.'],
-        diagnose: x => x.n === c && x.d === d ? `זה מה שהיה לפני. צריך רק ${uw} מזה.` : x.n === 1 + c && x.d === u + d ? 'חיברתם. "מתוך" פירושו כפל.' : null,
-        solve: { html: `${M(fr(1, u) + ' × ' + fr(c, d) + ' = ' + fr(c, u * d))}${gcd(c, u * d) > 1 ? ' = ' + nice(c, u * d) : ''}.`, scenes: [AREA(d, c, u, 1, true)] } }; },
-    () => { const d1 = ri(3, 6), n1 = ri(1, d1 - 1), d2 = ri(2, 5), n2 = ri(1, d2 - 1);
-      return { type: 'choice', prompt: `בלי לחשב: התוצאה של ${M(fr(n2, d2) + ' × ' + fr(n1, d1))} גדולה מ־${fr(n1, d1)} או קטנה ממנו?`, options: [`קטנה מ־${fr(n1, d1)}`, `גדולה מ־${fr(n1, d1)}`], ans: 0, txt: true,
-        hints: [`${fr(n2, d2)} קטן מ־1. מה פירוש "לקחת ${fr(n2, d2)} מתוך משהו"?`],
-        diagnose: () => `כפל בשבר שקטן מ־1 לוקח רק <b>חלק</b> מ־${fr(n1, d1)}, ולכן התוצאה קטנה יותר.`,
-        solve: { html: `לוקחים ${fr(n2, d2)} מתוך ${fr(n1, d1)}: רק חלק ממנו. החפיפה קטנה מהעמודות הכתומות.`, scenes: [AREA(d1, n1, d2, n2, true)] } }; }
+    () => { const d = ri(3, 7), n = ri(1, Math.min(3, d - 1)); let k = ri(2, 4); while (k * n > 2 * d) k--; if (k < 2) k = 2; const m = mulWhole(k, n, d);
+      return { say: `אנחנו ${k} חברים, וכל אחד רוצה ${fr(n, d)} חפיסה. כמה שוקולד צריך בסך הכל?`, scene: m.before,
+        steps: [{ kind: 'pick', q: `${M(k + ' × ' + fr(n, d) + ' = ?')}`, opts: fopts([k * n, d], [[k * n, k * d, `הכפלתם גם את המכנה. ${k} פעמים ${fr(n, d)} זה חיבור, וגודל החלק לא משתנה.`], [k + n, d, `זה כפל: ${k} פעמים ${n} חתיכות.`], [n, k * d, 'כך החלקים נעשים קטנים יותר. אבל כאן מוסיפים שוקולד!']]), then: m.after }],
+        hint: `כל אחד מקבל ${n} חתיכות. כמה חתיכות לכל ה־${k}?`, explain: `${M(k + ' × ' + n + ' = ' + k * n)} חתיכות של ${fr(1, d)}: ${fr(k * n, d)}${k * n > d ? ' = ' + nice(k * n, d) : ''}.` }; },
+    () => { const [u, uw] = pick([[2, 'חצי'], [3, 'שליש'], [4, 'רבע']]); const d = ri(2, 5), c = ri(1, d - 1);
+      return { say: `נשארו ${fr(c, d)} מהעוגה. אפשר ${uw} ממה שנשאר?`, scene: AREA(d, c),
+        steps: [
+          { kind: 'pick', style: 'knife', q: 'לכמה פסים לחתוך את העוגה לרוחב?', opts: knifeOpts(shuffle([u, ...[2, 3, 4, 5].filter(v => v !== u)]).slice(0, 3).sort((x, y) => (y === u) - (x === u)), u, v => `כדי לקחת ${uw} חותכים ל־${u} פסים, לא ל־${v}.`), then: AREA(d, c, u, 1, true) },
+          { kind: 'pick', q: 'איזה חלק מכל העוגה מקבלים?', opts: fopts([c, u * d], [[c, d, `זה כל מה שנשאר. רוצים רק ${uw} ממנו.`], [1 + c, u + d, 'בכפל לא מחברים.'], [c, u + d, `מכנה × מכנה: ${M(u + ' × ' + d)}.`]]), then: AREA(d, c, u, 1, true) }],
+        hint: `"${uw} מתוך" זה כפל ב־${fr(1, u)}. כמה משבצות יש בכל העוגה אחרי החיתוך?`, explain: `${M(fr(1, u) + ' × ' + fr(c, d) + ' = ' + fr(c, u * d))}: ${c} משבצות מפוספסות מתוך ${u * d}.` }; },
+    () => { const d1 = ri(2, 4), n1 = ri(1, d1 - 1), d2 = ri(2, 5), n2 = ri(1, d2 - 1);
+      return { say: `בתבנית יש ${fr(n2, d2)} עוגה. על ${fr(n1, d1)} ממנה שמים סוכריות. איזה חלק מכל התבנית עם סוכריות?`, scene: AREA(d2, n2),
+        steps: [
+          { kind: 'pick', style: 'knife', q: 'לכמה פסים לחתוך לרוחב?', opts: knifeOpts(shuffle([d1, ...[2, 3, 4, 5].filter(v => v !== d1)]).slice(0, 3).sort((x, y) => (y === d1) - (x === d1)), d1, v => `המכנה ${d1} אומר לחתוך ל־${d1} פסים.`), then: AREA(d2, n2, d1, n1, true) },
+          { kind: 'pick', q: `${M(fr(n1, d1) + ' × ' + fr(n2, d2) + ' = ?')}`, opts: fopts([n1 * n2, d1 * d2], [[n1 + n2, d1 + d2, 'בכפל לא מחברים: מונה × מונה, מכנה × מכנה.'], [n1 * n2, d2, 'גם את המכנים כופלים: לכמה משבצות נחתכה התבנית?'], [n2, d1 * d2, 'ספרו את המשבצות המפוספסות.']]), then: AREA(d2, n2, d1, n1, true) }],
+        hint: 'ספרו משבצות: כמה מפוספסות, ומתוך כמה בסך הכל?', explain: `${M(n1 + ' × ' + n2 + ' = ' + n1 * n2)} מפוספסות, מתוך ${M(d1 + ' × ' + d2 + ' = ' + d1 * d2)}: ${fr(n1 * n2, d1 * d2)}.` }; }
   ]
 };
 
-/* ---------- state ---------- */
-const KEY = 'fraclab-v1';
-let S = { u: {} };
-try { S = JSON.parse(localStorage.getItem(KEY)) || S; if (!S.u) S.u = {}; } catch (e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
-const U = id => S.u[id] || (S.u[id] = { dots: 0 });
-const pipsHtml = n => `<span class="pips" aria-hidden="true">${[0, 1, 2, 3, 4].map(i => `<i class="${i < Math.min(5, n) ? 'on' : ''}"></i>`).join('')}</span>`;
-
-let cur = 1, phase = 'learn';
-const $ = (s, r = document) => r.querySelector(s);
-
-function drawNav() {
-  $('#units').innerHTML = UNITS.map(u => `<button class="uchip" data-unit="${u.id}" aria-current="${u.id === cur}"><span class="n">${u.id}</span><span class="t">${u.name}${u.id < 6 ? pipsHtml(U(u.id).dots) : `<span class="pips" aria-hidden="true">${[1, 2, 3, 4, 5].map(i => `<i class="${Math.min(5, U(i).dots) === 5 ? 'on' : ''}"></i>`).join('')}</span>`}</span><span class="sr">${u.id < 6 ? Math.min(5, U(u.id).dots) + ' מתוך 5' : ''}</span></button>`).join('');
+/* ---------- routing / shell ---------- */
+const view = $('#view');
+function hud() {
+  $('#coins').textContent = S.coins; $('#starsTotal').textContent = starsTotal();
+  $('#soundBtn').innerHTML = S.sound ? SOUND_ON : SOUND_OFF; $('#soundBtn').setAttribute('aria-pressed', S.sound);
 }
-function drawHead() {
-  const u = UNITS[cur - 1];
-  const phases = cur === 6 ? '' : `<div class="phases" role="group" aria-label="שלב">${[['learn', 'רואים'], ['understand', 'מבינים'], ['practice', 'מתרגלים']].map(([k, t], i) => `<button data-phase="${k}" aria-pressed="${phase === k}"><span class="k">${i + 1}</span>${t}</button>`).join('')}</div>`;
-  $('#uhead').innerHTML = `<div><h2>${u.name}</h2><p>${u.goal}</p></div>${phases}`;
-}
-function draw() {
-  drawNav(); drawHead();
-  const p = $('#panel');
-  if (cur === 6) return drawPractice(p, 6);
-  if (phase === 'learn') drawLesson(p, cur);
-  else if (phase === 'understand') drawUnderstand(p, cur);
-  else drawPractice(p, cur);
-}
-function setPhase(ph) { phase = ph; draw(); $('#uhead').scrollIntoView({ block: 'nearest', behavior: REDUCE.matches ? 'auto' : 'smooth' }); }
-function swapHtml(el, html) { if (el.innerHTML === html) return; el.innerHTML = html; el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); }
+$('#hudKobi').innerHTML = kobi(); $('#coinIcon').innerHTML = COIN; $('#starIcon').innerHTML = star(true);
+$('#homeBtn').onclick = () => { location.hash = 'home'; };
+$('#soundBtn').onclick = () => { S.sound = !S.sound; save(); hud(); sfx.tap(); };
 
-/* ---------- 1. lesson ---------- */
+function route() {
+  const h = location.hash.slice(1);
+  let m;
+  if ((m = /^s([1-5])$/.exec(h))) drawStation(+m[1], 'lesson');
+  else if ((m = /^g([1-5])$/.exec(h))) drawStation(+m[1], 'game');
+  else if (h === 'race') drawRace();
+  else drawHome();
+  hud(); scrollTo({ top: 0, behavior: 'instant' });
+}
+window.addEventListener('hashchange', route);
+
+/* ---------- home ---------- */
+function drawHome() {
+  const nextUp = (STATIONS.find(s => !(S.stars[s.id] >= 2)) || {}).id;
+  const greet = S.coins ? `ברוכים השבים! יש לכם ${S.coins} מטבעות. ${nextUp ? `מה דעתכם להמשיך בתחנה ${nextUp}?` : 'סיימתם את כל התחנות. נסו לשבור שיא במרוץ!'}` : 'שלום! אני קובי, קוביית שוקולד שאוהבת שברים. בכל תחנה: קודם אני מראה, אחר כך אתם ממלאים הזמנות של לקוחות.';
+  view.innerHTML = `
+    <section class="hero">${kobi('happy')}<div><h1>מאפיית <em>השברים</em></h1><div class="speech"><p style="margin:0">${greet}</p></div></div></section>
+    <div class="sechead"><h2>מפת התחנות</h2><p>שני כוכבים בתחנה פותחים את התחנה הבאה במסלול המומלץ</p></div>
+    <section class="map">${STATIONS.map(s => `
+      <article class="card${s.id === nextUp ? ' next-up' : ''}">
+        <div class="band" style="background:${s.band}"><span class="badge">${s.id}</span><span class="stars" aria-label="${S.stars[s.id] || 0} כוכבים">${[1, 2, 3].map(i => star(i <= (S.stars[s.id] || 0))).join('')}</span>${s.art()}${s.id === nextUp ? '<span class="nexttag">הבא בתור</span>' : ''}</div>
+        <div class="body"><h3>${s.name}</h3><p>${s.goal}</p>
+          <div class="acts"><a class="tbtn sm ghost" href="#s${s.id}" style="text-decoration:none">שיעור</a><a class="tbtn sm" href="#g${s.id}" style="text-decoration:none">הזמנות ←</a></div></div>
+      </article>`).join('')}
+      <article class="card">
+        <div class="band" style="background:var(--c6)"><span class="badge">★</span><span style="font:700 40px var(--font-display);display:flex;align-items:center;gap:10px">60<small style="font-size:18px">שניות</small></span></div>
+        <div class="body"><h3>מרוץ השברים</h3><p>כל הנושאים מעורבבים, נגד השעון. שיא אישי: <b>${S.race}</b></p>
+          <div class="acts"><a class="tbtn sm sun" href="#race" style="text-decoration:none">למרוץ ←</a></div></div>
+      </article>
+    </section>
+    <details class="guide"><summary>להורים ולמורים: איך המשחק מלמד</summary><ul>
+      <li><b>מוחשי, אחר כך ציורי, אחר כך מופשט.</b> כל כלל נראה קודם כפעולה על שוקולד (חותכים, מעבירים חתיכות), ורק אחר כך כתרגיל.</li>
+      <li><b>ניבוי לפני הסבר.</b> בשיעור, הילד מנחש מה יקרה לפני שהאנימציה מראה. ניחוש, גם שגוי, מחזק את ההסבר שבא אחריו.</li>
+      <li><b>הדרכה שהולכת ונעלמת.</b> בהזמנה הראשונה בכל סבב קובי נותן טיפ מראש. אחר כך רמז רק לפי בקשה. בהשלמה לשלם יש גם שאלות בלי ציור.</li>
+      <li><b>משוב שמזהה את הטעות.</b> כל תשובה שגויה מייצגת טעות נפוצה (חיבור מכנים, הכפלת המכנה במספר שלם, היפוך מונה ומכנה), וקובי מסביר בדיוק אותה.</li>
+      <li><b>מניפולציה ולא רק בחירה.</b> חותכים חפיסה ובוחרים חתיכות, בוחרים סכין למכנה משותף, ומשחקים זיכרון של שברים שווים.</li>
+      <li><b>תרגול מעורב.</b> מרוץ השברים מערבב את כל הנושאים, כך שהילד צריך לזהות בעצמו איזה כלל מתאים.</li>
+      <li>ההתקדמות נשמרת בדפדפן הזה בלבד.</li></ul></details>`;
+}
+
+/* ---------- station shell ---------- */
+function drawStation(id, tab) {
+  const s = STATIONS[id - 1];
+  view.innerHTML = `
+    <div class="shead"><div class="ttl"><span class="num" style="background:${s.band}">${id}</span><div><h2>${s.name}</h2><p>${s.goal}</p></div></div>
+      <div class="tabs" role="group" aria-label="מצב"><button data-tab="lesson" aria-pressed="${tab === 'lesson'}">שיעור עם קובי</button><button data-tab="game" aria-pressed="${tab === 'game'}">הזמנות</button></div></div>
+    <section class="panel" id="panel"></section>`;
+  view.querySelector('.tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) location.hash = (b.dataset.tab === 'lesson' ? 's' : 'g') + id; };
+  if (tab === 'lesson') drawLesson($('#panel'), id); else drawGame($('#panel'), id);
+}
+
+/* ---------- lesson ---------- */
 function drawLesson(root, u) {
   const steps = LESSONS[u]; let i = 0; const answered = {};
-  root.innerHTML = `<div class="stage-host"></div>
-    <div class="narr"><div class="eq" dir="ltr" aria-live="polite"></div><p class="say" aria-live="polite"></p><div class="ask" hidden></div></div>
-    <div class="ctrls"><button class="btn" data-prev>→ הקודם</button><div class="steps" aria-hidden="true"></div><button class="btn primary" data-next>הבא ←</button></div>`;
-  const stage = new Stage($('.stage-host', root));
-  const eqEl = $('.eq', root), sayEl = $('.say', root), askEl = $('.ask', root), prev = $('[data-prev]', root), next = $('[data-next]', root), dots = $('.steps', root);
+  root.innerHTML = `<div class="stage-host" style="position:relative"></div>
+    <div class="talk"><div id="lk">${kobi('happy')}</div><div class="speech"><p id="say" aria-live="polite"></p><div class="ask" id="ask" hidden></div></div></div>
+    <div class="lfoot"><button class="tbtn ghost sm" data-prev>→ אחורה</button><div class="dots" aria-hidden="true"></div><button class="tbtn" data-next>הבא ←</button></div>`;
+  const host = $('.stage-host', root);
+  const stage = new Stage(host);
+  const tag = document.createElement('div'); tag.className = 'eqtag'; tag.dir = 'ltr'; host.appendChild(tag);
+  const sayEl = $('#say', root), askEl = $('#ask', root), prev = $('[data-prev]', root), next = $('[data-next]', root), dots = $('.dots', root), lk = $('#lk', root);
+  const swap = (el, h) => { if (el.innerHTML === h) return; el.innerHTML = h; el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); };
   function show() {
     const s = steps[i], pending = s.ask && answered[i] === undefined;
-    const before = s.pre || steps[i - 1] || s;
-    const view = pending ? before : s;
-    stage.render(view.scene);
-    swapHtml(eqEl, view.eq || '');
-    swapHtml(sayEl, pending ? (s.pre && s.pre.say || '') : s.say);
+    const view = pending ? (s.pre || steps[i - 1] || s) : s;
+    stage.render(view.scene); swap(tag, view.eq || '');
+    let mood = 'happy';
+    if (pending) { mood = 'think'; swap(sayEl, (s.pre && s.pre.say) || 'רגע, לפני שאני מראה: מה אתם חושבים?'); }
+    else swap(sayEl, s.say);
     if (s.ask) {
-      askEl.hidden = false;
-      const a = answered[i];
+      askEl.hidden = false; const a = answered[i];
       const txt = s.ask.options.some(o => /^[֐-׿]/.test(o));
-      askEl.innerHTML = `<p class="qtext">${s.ask.q}</p><div class="opts">${s.ask.options.map((o, k) => `<button class="opt${txt ? ' txt' : ''}${a !== undefined && k === s.ask.correct ? ' right' : ''}${a === k && k !== s.ask.correct ? ' wrong' : ''}" data-opt="${k}" ${a !== undefined ? 'disabled' : ''}>${o}</button>`).join('')}</div>` +
-        (a !== undefined ? `<div class="fbk ${a === s.ask.correct ? 'ok' : 'hint'}"><p>${a === s.ask.correct ? '<strong>ניחשתם נכון.</strong> ' + s.ask.right : '<strong>טוב שניחשתם.</strong> ' + s.ask.wrong}</p></div>` : `<p class="say" style="font-size:15px;color:var(--muted)">קודם מנחשים, ואז רואים.</p>`);
-      if (a !== undefined) sayEl.hidden = false;
+      askEl.innerHTML = `<span class="qline">${s.ask.q}</span><div class="bubs">${s.ask.options.map((o, k) => `<button class="bub${txt ? ' txt' : ''}${a !== undefined && k === s.ask.correct ? ' right' : ''}${a === k && k !== s.ask.correct ? ' wrong' : ''}" data-opt="${k}" ${a !== undefined ? 'disabled' : ''}>${o}</button>`).join('')}</div>` +
+        (a !== undefined ? `<p class="prose" style="margin:0">${a === s.ask.correct ? '<b>ניחשתם נכון!</b> ' + s.ask.right : '<b>יפה שניחשתם.</b> ' + s.ask.wrong}</p>` : '');
+      if (a !== undefined) mood = a === s.ask.correct ? 'wow' : 'happy';
     } else { askEl.hidden = true; askEl.innerHTML = ''; }
-    sayEl.hidden = pending && !(s.pre && s.pre.say);
-    prev.disabled = i === 0;
-    next.disabled = pending;
-    next.textContent = i === steps.length - 1 ? 'לדוגמה הפתורה ←' : 'הבא ←';
-    dots.innerHTML = steps.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('');
+    lk.innerHTML = kobi(mood);
+    prev.disabled = i === 0; next.disabled = pending;
+    next.textContent = i === steps.length - 1 ? 'למתכון ←' : 'הבא ←';
+    dots.innerHTML = steps.map((_, k) => `<i class="${k < i ? 'on' : k === i ? 'cur' : ''}"></i>`).join('');
   }
   root.onclick = e => {
     const o = e.target.closest('[data-opt]');
-    if (o) { answered[i] = +o.dataset.opt; show(); return; }
-    if (e.target.closest('[data-prev]') && i > 0) { i--; show(); }
-    if (e.target.closest('[data-next]')) { if (i < steps.length - 1) { i++; show(); } else setPhase('understand'); }
+    if (o) { answered[i] = +o.dataset.opt; const ok = answered[i] === steps[i].ask.correct; ok ? sfx.ok() : sfx.tap(); show(); if (ok) confetti(...centerOf(o), 30); return; }
+    if (e.target.closest('[data-prev]') && i > 0) { sfx.tap(); i--; show(); }
+    if (e.target.closest('[data-next]')) { sfx.tap(); if (i < steps.length - 1) { i++; show(); } else drawRecipe(root, u); }
   };
   show();
 }
-
-/* ---------- 2. understand ---------- */
-function drawUnderstand(root, u) {
-  const w = WORKED[u]; let shown = 1;
-  const box = `<input class="nbox" id="faded-in" inputmode="numeric" autocomplete="off" aria-label="המספר החסר">`;
-  root.innerHTML = `<div class="und">
-    <section class="block"><span class="kicker">דוגמה פתורה</span><h3>${w.ex.title}</h3><ol class="wsteps" id="ws"></ol><div class="row"><button class="btn" id="more">הצעד הבא</button></div></section>
-    <section class="block"><span class="kicker">עכשיו אתם: השלימו את הצעד החסר</span><h3>${w.faded.title}</h3>
-      <ol class="wsteps">${w.faded.steps.map(s => `<li>${s.replace('{box}', box)}</li>`).join('')}</ol>
-      <div class="row"><button class="btn primary" id="fcheck">בדיקה</button></div><div id="ffb"></div></section>
-    <section class="block"><span class="kicker">למה זה עובד?</span><h3>${w.why.q}</h3><div class="opts col" id="why">${shuffle(w.why.options.map((o, k) => [o, k])).map(([o, k]) => `<button class="opt txt" data-why="${k}">${o}</button>`).join('')}</div><div id="wfb"></div></section>
-    <div class="ctrls"><button class="btn" data-back>→ חזרה לאנימציה</button><span></span><button class="btn primary" data-go>לתרגול ←</button></div>
-  </div>`;
-  const ws = $('#ws', root), more = $('#more', root);
-  const paint = () => { ws.innerHTML = w.ex.steps.slice(0, shown).map((s, k) => `<li class="${k === w.ex.steps.length - 1 ? 'final' : ''}">${s}</li>`).join(''); more.hidden = shown >= w.ex.steps.length; };
-  paint();
-  more.onclick = () => { shown++; paint(); };
-  const input = $('#faded-in', root), ffb = $('#ffb', root);
-  const check = () => {
-    const v = parseInt(input.value, 10);
-    if (isNaN(v)) { ffb.innerHTML = `<div class="fbk hint"><p>כתבו מספר בתיבה.</p></div>`; return; }
-    if (v === w.faded.answer) { input.disabled = true; $('#fcheck', root).hidden = true; ffb.innerHTML = `<div class="fbk ok"><p><strong>נכון.</strong> ${w.faded.done}</p></div>`; }
-    else ffb.innerHTML = `<div class="fbk bad"><p><strong>עוד לא.</strong> ${w.faded.wrong}</p></div>`;
-  };
-  $('#fcheck', root).onclick = check;
-  input.onkeydown = e => { if (e.key === 'Enter') check(); };
-  root.onclick = e => {
-    const b = e.target.closest('[data-why]');
-    if (b) {
-      const k = +b.dataset.why, ok = k === w.why.correct;
-      root.querySelectorAll('[data-why]').forEach(x => { x.disabled = true; if (+x.dataset.why === w.why.correct) x.classList.add('right'); });
-      if (!ok) b.classList.add('wrong');
-      $('#wfb', root).innerHTML = `<div class="fbk ${ok ? 'ok' : 'hint'}"><p>${ok ? '<strong>בדיוק.</strong> ' : '<strong>התשובה המסומנת בירוק.</strong> '}${w.why.explain}</p></div>`;
-    }
-    if (e.target.closest('[data-back]')) setPhase('learn');
-    if (e.target.closest('[data-go]')) setPhase('practice');
-  };
+function drawRecipe(root, u) {
+  const r = RECIPE[u], ex = EXAMPLES[u];
+  root.innerHTML = `<div class="recipe">${kobi('wow')}<div style="display:flex;flex-direction:column;gap:16px">
+    <div class="rcard"><span class="tag">כרטיס המתכון של קובי</span><h3>${r.rule}</h3></div>
+    <div class="rcard" style="background:var(--c2)"><span class="tag">דוגמה פתורה</span><h3 style="font-size:20px">${ex.title}</h3><ol id="exs"></ol><div><button class="tbtn ghost sm" id="more">הצעד הבא</button></div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="tbtn" href="#g${u}" style="text-decoration:none">יאללה להזמנות ←</a><button class="tbtn ghost" id="again">לראות שוב</button></div></div></div>`;
+  let n = 1; const paint = () => { $('#exs', root).innerHTML = ex.steps.slice(0, n).map(s => `<li class="swap">${s}</li>`).join(''); $('#more', root).hidden = n >= ex.steps.length; };
+  paint(); $('#more', root).onclick = () => { sfx.tap(); n++; paint(); };
+  $('#again', root).onclick = () => drawLesson(root, u);
+  root.onclick = null;
 }
 
-/* ---------- 3. practice ---------- */
-const PRAISE = ['נכון!', 'מצוין!', 'בדיוק!', 'יפה מאוד!'];
-function pickUnit(unitId) {
-  if (unitId !== 6) return unitId;
-  const ws = [1, 2, 3, 4, 5].map(i => 6 - Math.min(5, U(i).dots));
-  let r = Math.random() * ws.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < 5; i++) { r -= ws[i]; if (r <= 0) return i + 1; }
-  return 5;
-}
-let lastGen = '';
-function makeQ(unitId) {
-  const u = pickUnit(unitId); let g, key, guard = 0;
-  do { g = ri(0, GEN[u].length - 1); key = u + ':' + g; } while (key === lastGen && GEN[u].length > 1 && guard++ < 10);
-  lastGen = key;
-  return { ...GEN[u][g](), unit: u };
-}
-function drawPractice(root, unitId) {
-  let q, tries, hintN, done, shadeSet;
-  const meter = () => {
-    if (unitId === 6) { const m = [1, 2, 3, 4, 5].filter(i => U(i).dots >= 5).length; return `<span>נושאים שנשלטו</span><span class="pips">${[1, 2, 3, 4, 5].map(i => `<i class="${U(i).dots >= 5 ? 'on' : ''}"></i>`).join('')}</span><span>${m}/5</span>`; }
-    const d = Math.min(5, U(unitId).dots); return `<span>פס השליטה</span>${pipsHtml(d)}<span>${M(fr(d, 5))}</span>`;
-  };
-  function next() { q = makeQ(unitId); tries = 0; hintN = 0; done = false; shadeSet = new Set(); paint(); }
-  function inputHtml() {
-    if (q.type === 'num') return `<input class="nbox" id="a-n" inputmode="numeric" autocomplete="off" aria-label="התשובה">`;
-    if (q.type === 'frac') return `<span class="fin"><input id="a-n" inputmode="numeric" autocomplete="off" aria-label="מונה"><i></i><input id="a-d" inputmode="numeric" autocomplete="off" aria-label="מכנה"></span>`;
-    return '';
-  }
-  function paint() {
-    const unitName = UNITS[q.unit - 1].name;
-    root.innerHTML = `<div class="prac">
-      <div class="pbar"><div class="meter">${meter()}</div>${unitId === 6 ? `<span class="from">${unitName}</span>` : '<span class="from">תשובה נכונה בניסיון הראשון, בלי רמז, ממלאת חלק בפס</span>'}</div>
-      <div class="stage-host" ${q.visual ? '' : 'hidden'}></div>
-      <div class="qbody">
-        <p class="qtext">${q.prompt}</p>
-        ${q.eq ? `<div class="qeq" dir="ltr">${q.eq.replace('{box}', inputHtml())}</div>` : ''}
-        ${q.type === 'choice' ? `<div class="opts${q.txt ? ' col' : ''}" style="${q.txt ? 'max-width:460px' : ''}">${q.options.map((o, k) => `<button class="opt${q.txt ? ' txt' : ''}" data-c="${k}">${o}</button>`).join('')}</div>` : ''}
-        ${q.type === 'shade' ? `<div class="shade" role="group" aria-label="חלקי המלבן">${Array.from({ length: q.parts }, (_, k) => `<button data-s="${k}" aria-pressed="false" aria-label="חלק ${k + 1}"></button>`).join('')}</div><span class="shade-count" id="sc">צבועים: 0 מתוך ${q.parts}</span>` : ''}
-        <div id="fb" style="display:contents"></div>
-        <div class="qact">
-          ${q.type !== 'choice' ? '<button class="btn primary" id="check">בדיקה</button>' : ''}
-          <button class="btn" id="hint">רמז</button>
-          <button class="btn primary" id="nextq" hidden>שאלה הבאה ←</button>
-        </div>
-      </div></div>`;
-    const host = $('.stage-host', root);
-    root._stage = new Stage(host, true);
-    if (q.visual) root._stage.render(q.visual);
-    const first = $('#a-n', root); if (first && matchMedia('(hover:hover)').matches) first.focus({ preventScroll: true });
-    root.querySelectorAll('input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(); }));
-  }
-  function fb(cls, html) { $('#fb', root).innerHTML = `<div class="fbk ${cls}">${html}</div>`; }
-  function playSolution() {
-    const sc = q.solve.scenes; if (!sc) return;
-    const host = $('.stage-host', root); host.hidden = false;
-    sc.forEach((s, k) => setTimeout(() => root._stage && root._stage.render(s), k * 1300 + 60));
-  }
-  function finish(ok) {
-    done = true;
-    root.querySelectorAll('input, [data-c], [data-s]').forEach(x => x.disabled = true);
-    const c = $('#check', root); if (c) c.hidden = true; $('#hint', root).hidden = true;
-    const n = $('#nextq', root); n.hidden = false; n.focus({ preventScroll: true });
-    if (q.type === 'shade' && !ok) root.querySelectorAll('[data-s]').forEach((b, k) => b.setAttribute('aria-pressed', k < q.ans));
-    playSolution();
-  }
-  function check() {
-    if (done) return;
-    let val, ok, mis = null, extra = '';
-    if (q.type === 'num') {
-      val = parseInt($('#a-n', root).value, 10);
-      if (isNaN(val)) return fb('hint', '<p>כתבו מספר בתיבה.</p>');
-      ok = val === q.ans;
-    } else if (q.type === 'frac') {
-      const n = parseInt($('#a-n', root).value, 10), d = parseInt($('#a-d', root).value, 10);
-      if (isNaN(n) || isNaN(d)) return fb('hint', '<p>כתבו מספר גם במונה (למעלה) וגם במכנה (למטה).</p>');
-      if (d === 0) return fb('hint', '<p>המכנה לא יכול להיות 0: אי אפשר לחתוך שלם לאפס חלקים.</p>');
-      val = { n, d }; ok = sameVal(val, q.ans[0], q.ans[1]);
-      if (ok) {
-        const g = gcd(n, d);
-        if (g > 1) extra += ` אפשר גם לצמצם: ${M(fr(n, d) + ' = ' + fr(n / g, d / g))}.`;
-        if (n > d && d / g !== 1) extra += ` וכמספר מעורב: ${nice(n, d)}.`;
-      }
-    } else if (q.type === 'shade') {
-      val = shadeSet.size; ok = val === q.ans;
-      if (!val) return fb('hint', '<p>לחצו על חלקים במלבן כדי לצבוע אותם.</p>');
-    } else if (q.type === 'choice') { ok = val === q.ans; }
-    if (ok) {
-      const first = tries === 0 && hintN === 0;
-      if (first) { U(q.unit).dots++; save(); drawNav(); $('.meter', root).innerHTML = meter(); }
-      const full = first && U(q.unit).dots === 5;
-      fb('ok', `<p><strong>${pick(PRAISE)}</strong> ${q.solve.html}${extra}</p>${full ? `<p>מילאתם את הפס של "${UNITS[q.unit - 1].name}": ${M(fr(5, 5) + ' = 1')} שלם.</p>` : ''}`);
-      finish(true);
-    } else {
-      tries++;
-      mis = q.diagnose ? q.diagnose(val) : null;
-      if (tries >= 2) { fb('bad', `<p><strong>כך פותרים:</strong> ${q.solve.html}</p>${mis ? `<p>${mis}</p>` : ''}`); finish(false); }
-      else fb('bad', `<p><strong>עוד לא.</strong> ${mis || 'נסו שוב. אפשר גם לבקש רמז.'}</p>`);
+/* ---------- game ---------- */
+function drawGame(root, st) {
+  const gens = ORDERS[st], LEN = 6;
+  const plan = [0, ...shuffle(Array.from({ length: LEN - 1 }, (_, k) => (k + 1) % gens.length))];
+  const results = []; let oi = 0;
+  function drawOrder() {
+    const o = gens[plan[oi]](); const who = { name: pick(NAMES), seed: ri(0, 1 << 14) };
+    let step = 0, stepMist = 0, mist = 0, usedHint = false;
+    root.innerHTML = `
+      <div class="gtop"><div class="plates" aria-label="הזמנות">${Array.from({ length: LEN }, (_, k) => `<span class="plate${k < oi ? ' done' + (results[k] ? ' ok' : '') : k === oi ? ' cur' : ''}"></span>`).join('')}</div><span class="gcount">הזמנה ${oi + 1} מתוך ${LEN}</span></div>
+      <div class="order"><div class="cust">${avatar(who.seed)}</div><div class="speech"><span class="who">${who.name} מזמינים:</span><p id="osay">${o.say}</p></div></div>
+      <div class="stage-host" ${o.scene ? '' : 'hidden'}></div>
+      <div class="work"><p class="stepq" id="stepq"></p><div id="area" style="width:100%;display:flex;justify-content:center"></div></div>
+      <div id="kl"></div>
+      <div class="gact"><button class="tbtn ghost sm" id="hintBtn">רמז מקובי</button><button class="tbtn" id="go" hidden></button></div>`;
+    const host = $('.stage-host', root), stage = new Stage(host, true);
+    if (o.scene) stage.render(o.scene);
+    const area = $('#area', root), go = $('#go', root), hintBtn = $('#hintBtn', root);
+    const say = (mood, cls, html) => { $('#kl', root).innerHTML = `<div class="kline ${cls}">${kobi(mood)}<p class="kb">${html}</p></div>`; };
+    if (oi === 0) { say('happy', '', `<b>טיפ להזמנה הראשונה:</b> ${o.hint}`); hintBtn.hidden = true; }
+    hintBtn.onclick = () => { usedHint = true; sfx.tap(); say('think', '', `<b>רמז:</b> ${o.hint}`); hintBtn.hidden = true; };
+
+    function stepDone(s) {
+      if (s.then) { host.hidden = false; stage.render(s.then); }
+      step++; stepMist = 0;
+      if (step < o.steps.length) setTimeout(drawStep, REDUCE.matches ? 0 : 750);
+      else setTimeout(orderDone, REDUCE.matches ? 0 : 450);
     }
+    function wrong(why, el) {
+      mist++; stepMist++; sfx.bad();
+      if (el) { el.classList.add('wrong'); el.disabled = true; }
+      say('think', 'bad', why || 'כמעט! נסו שוב.');
+    }
+    function orderDone() {
+      const perfect = mist === 0 && !usedHint; results[oi] = perfect;
+      sfx.win(); confetti(...centerOf($('.cust', root)), perfect ? 80 : 40);
+      $('.order', root).classList.add('happy');
+      $('#osay', root).innerHTML = pick(['תודה רבה! בדיוק מה שרציתי.', 'מושלם, תודה!', 'וואו, איזה יופי. תודה!']);
+      say('wow', 'ok', `${perfect ? '<b>מושלם! 3 מטבעות.</b> ' : '<b>הזמנה הוגשה! מטבע אחד.</b> '}${o.explain}`);
+      addCoins(perfect ? 3 : 1, $('.cust', root));
+      hintBtn.hidden = true;
+      const pl = root.querySelectorAll('.plate')[oi]; pl.className = 'plate done' + (perfect ? ' ok' : '');
+      go.hidden = false; go.textContent = oi === LEN - 1 ? 'לסיכום ←' : 'הזמנה הבאה ←';
+      go.onclick = () => { sfx.tap(); oi++; oi < LEN ? drawOrder() : levelEnd(); };
+      go.focus({ preventScroll: true });
+    }
+    function drawStep() {
+      const s = o.steps[step];
+      $('#stepq', root).innerHTML = s.q || '';
+      if (s.kind === 'pick') {
+        area.innerHTML = `<div class="bubs">${s.opts.map((op, k) => `<button class="bub${s.style === 'knife' ? ' knife' : ''}" data-k="${k}">${op.h}</button>`).join('')}</div>`;
+        area.onclick = e => {
+          const b = e.target.closest('[data-k]'); if (!b || b.disabled) return;
+          const op = s.opts[+b.dataset.k];
+          if (op.ok) {
+            sfx.ok(); b.classList.add('right'); area.querySelectorAll('[data-k]').forEach(x => x.disabled = true);
+            if (s.style === 'knife') sfx.cut();
+            if (stepMist === 0 && $('#kl .bad', root)) $('#kl', root).innerHTML = '';
+            stepDone(s);
+          } else {
+            wrong(op.why, b);
+            if (stepMist >= 2) {
+              area.querySelectorAll('[data-k]').forEach(x => { x.disabled = true; if (s.opts[+x.dataset.k].ok) x.classList.add('right'); });
+              say('happy', '', `${op.why || ''} <b>התשובה הנכונה מסומנת בירוק.</b>`);
+              go.hidden = false; go.textContent = 'הבנתי, ממשיכים ←'; go.onclick = () => { go.hidden = true; stepDone(s); };
+            }
+          }
+        };
+      } else if (s.kind === 'cut') drawCutter(s);
+      else if (s.kind === 'memory') drawMemory(s);
+    }
+    function drawCutter(s) {
+      let partsN = 1; const taken = new Set();
+      const paint = () => {
+        area.innerHTML = `<div class="cutter">
+          <div class="stepper"><button data-d="-1" aria-label="פחות חלקים">−</button><span class="kn">${partsN}</span><button data-d="1" aria-label="יותר חלקים">+</button><span class="lbl">${partsN === 1 ? 'חפיסה שלמה' : 'חלקים שווים'}</span></div>
+          <div class="tapbar" dir="rtl">${Array.from({ length: partsN }, (_, k) => `<button data-p="${k}" aria-pressed="${taken.has(k)}" aria-label="חלק ${k + 1}"></button>`).join('')}</div>
+          <span class="takeinfo">${partsN > 1 ? `לקחתם ${taken.size} מתוך ${partsN} חלקים` : 'קודם חותכים: לחצו על +'}</span>
+          <button class="tbtn sun" data-serve>מגישים!</button></div>`;
+      };
+      paint();
+      area.onclick = e => {
+        const d = e.target.closest('[data-d]'), p = e.target.closest('[data-p]'), sv = e.target.closest('[data-serve]');
+        if (d) { const nv = Math.min(12, Math.max(1, partsN + +d.dataset.d)); if (nv !== partsN) { partsN = nv; taken.clear(); sfx.cut(); paint(); } }
+        else if (p) { const k = +p.dataset.p; taken.has(k) ? taken.delete(k) : taken.add(k); sfx.tap(); p.setAttribute('aria-pressed', taken.has(k)); area.querySelector('.takeinfo').textContent = `לקחתם ${taken.size} מתוך ${partsN} חלקים`; }
+        else if (sv) {
+          if (partsN < 2) return say('think', '', 'קודם חותכים את החפיסה: לחצו על + כדי לבחור לכמה חלקים.');
+          if (!taken.size) return say('think', '', 'לחצו על חלקים כדי לקחת אותם להזמנה.');
+          if (eqv([taken.size, partsN], [s.n, s.d])) {
+            sfx.ok(); area.querySelectorAll('button').forEach(x => x.disabled = true);
+            if (partsN !== s.d) say('wow', 'ok', `חכם! ${M(fr(taken.size, partsN) + ' = ' + fr(s.n, s.d))}, אותה כמות.`);
+            stepDone(s);
+          } else {
+            const why = partsN !== s.d && !(partsN % s.d === 0) ? `המכנה הוא ${s.d}: חותכים ל־${s.d} חלקים שווים.` : taken.size === partsN - s.n * partsN / s.d ? 'לקחתם את מה שצריך להישאר. המונה אומר כמה <b>לקחת</b>.' : `ספרו: צריך ${s.n} חלקים מתוך ${s.d}.`;
+            wrong(why, null);
+            if (stepMist >= 2) { partsN = s.d; taken.clear(); for (let k = 0; k < s.n; k++) taken.add(k); paint(); area.querySelectorAll('button').forEach(x => x.disabled = true); say('happy', '', `כך: חותכים ל־${s.d} ולוקחים ${s.n}.`); go.hidden = false; go.textContent = 'הבנתי, ממשיכים ←'; go.onclick = () => { go.hidden = true; stepDone(s); }; }
+          }
+        }
+      };
+    }
+    function drawMemory(s) {
+      let open = [], got = 0, misses = 0, lock = false;
+      area.innerHTML = `<div class="mem">${s.cards.map((c, k) => `<button class="mcard" data-m="${k}" aria-label="קלף ${k + 1}"><span class="in"><span class="f">${kobi('happy')}</span><span class="b">${c.h}</span></span></button>`).join('')}</div>`;
+      area.onclick = e => {
+        const b = e.target.closest('[data-m]'); if (!b || lock || b.classList.contains('up') || b.classList.contains('got')) return;
+        sfx.tap(); b.classList.add('up'); open.push(b);
+        if (open.length < 2) return;
+        const [x, y] = open; open = [];
+        if (s.cards[+x.dataset.m].id === s.cards[+y.dataset.m].id) {
+          setTimeout(() => { x.classList.add('got'); y.classList.add('got'); sfx.ok(); got++; if (got === s.cards.length / 2) { mist = misses > 4 ? 1 : 0; stepDone(s); } }, 350);
+        } else {
+          misses++; lock = true; setTimeout(() => { x.classList.remove('up'); y.classList.remove('up'); lock = false; }, 1000);
+          if (misses === 3) say('think', '', 'טיפ: חפשו קלף עם ציור, ובדקו איזה חלק מהחפיסה צבוע.');
+        }
+      };
+    }
+    drawStep();
   }
-  root.onclick = e => {
-    const c = e.target.closest('[data-c]');
-    if (c && !done) {
-      const k = +c.dataset.c;
-      if (k === q.ans) c.classList.add('right'); else c.classList.add('wrong');
-      // choice: one wrong pick ends it, since only two or three options exist
-      const ok = k === q.ans;
-      if (!ok) tries = 1;
-      if (ok) { checkChoice(true); } else { checkChoice(false); }
-      return;
-    }
-    const s = e.target.closest('[data-s]');
-    if (s && !done) {
-      const k = +s.dataset.s; shadeSet.has(k) ? shadeSet.delete(k) : shadeSet.add(k);
-      s.setAttribute('aria-pressed', shadeSet.has(k));
-      $('#sc', root).textContent = `צבועים: ${shadeSet.size} מתוך ${q.parts}`;
-      return;
-    }
-    if (e.target.closest('#check')) check();
-    if (e.target.closest('#hint')) {
-      const h = q.hints[Math.min(hintN, q.hints.length - 1)]; hintN++;
-      fb('hint', `<p><strong>רמז ${Math.min(hintN, q.hints.length)}:</strong> ${h}</p>`);
-      if (hintN >= q.hints.length) $('#hint', root).disabled = true;
-    }
-    if (e.target.closest('#nextq')) next();
-  };
-  function checkChoice(ok) {
-    root.querySelectorAll('[data-c]').forEach(b => { if (+b.dataset.c === q.ans) b.classList.add('right'); });
-    if (ok) {
-      const first = hintN === 0;
-      if (first) { U(q.unit).dots++; save(); drawNav(); $('.meter', root).innerHTML = meter(); }
-      fb('ok', `<p><strong>${pick(PRAISE)}</strong> ${q.solve.html}</p>`);
-    } else fb('bad', `<p><strong>לא הפעם.</strong> ${q.diagnose ? q.diagnose() : ''}</p><p>${q.solve.html}</p>`);
-    finish(ok);
+  function levelEnd() {
+    const good = results.filter(Boolean).length, stars = good >= 5 ? 3 : good >= 3 ? 2 : 1;
+    const prev = S.stars[st] || 0; if (stars > prev) { S.stars[st] = stars; save(); hud(); }
+    const ov = document.createElement('div'); ov.className = 'over';
+    ov.innerHTML = `${kobi(stars === 3 ? 'wow' : 'happy')}<div class="bigstars">${[1, 2, 3].map(i => star(i <= stars)).join('')}</div>
+      <h3>${stars === 3 ? 'שף שברים!' : stars === 2 ? 'עבודה טובה!' : 'סיימתם סבב!'}</h3>
+      <p>${good} מתוך ${LEN} הזמנות היו מושלמות. ${stars < 3 ? 'הזמנה מושלמת היא בלי טעות ובלי רמז. רוצים לנסות לשלושה כוכבים?' : 'כל הכבוד!'}</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="tbtn" id="again">עוד סבב</button>${st < 5 ? `<a class="tbtn sun" href="#s${st + 1}" style="text-decoration:none">לתחנה ${st + 1} ←</a>` : '<a class="tbtn sun" href="#race" style="text-decoration:none">למרוץ ←</a>'}<a class="tbtn ghost" href="#home" style="text-decoration:none">למפה</a></div>`;
+    ov.querySelector('.kobi').style.cssText = 'width:110px;height:110px';
+    root.appendChild(ov); sfx.win(); confetti(innerWidth / 2, innerHeight / 3, 120);
+    ov.querySelector('#again').onclick = () => drawGame(root, st);
   }
-  next();
+  drawOrder();
 }
 
-/* ---------- boot ---------- */
-$('#units').addEventListener('click', e => {
-  const b = e.target.closest('[data-unit]'); if (!b) return;
-  location.hash = 'u' + b.dataset.unit;
-});
-$('#uhead').addEventListener('click', e => { const b = e.target.closest('[data-phase]'); if (b) setPhase(b.dataset.phase); });
-function route() {
-  const m = /^#u([1-6])$/.exec(location.hash);
-  const n = m ? +m[1] : 1;
-  if (n !== cur || !route.done) { cur = n; phase = cur === 6 ? 'practice' : 'learn'; }
-  route.done = true; draw();
+/* ---------- race ---------- */
+const RACE = [
+  () => { const d = ri(3, 10), a = ri(1, d - 2), c = ri(1, d - 1 - a); return { eq: E(fr(a, d), OP.plus, fr(c, d), OP.eq, '?'), opts: fopts([a + c, d], [[a + c, 2 * d], [a * c, d]]) }; },
+  () => { const d = ri(3, 12), n = ri(1, d - 1); return { eq: E(1, OP.minus, fr(n, d), OP.eq, '?'), opts: fopts([d - n, d], [[n, d], [d - n, n]]) }; },
+  () => { const d = ri(3, 9), n = ri(1, 3), k = ri(2, 4); return { eq: E(k, OP.times, fr(n, d), OP.eq, '?'), opts: fopts([k * n, d], [[k * n, k * d], [k + n, d]]) }; },
+  () => { const d1 = ri(2, 4), n1 = ri(1, d1 - 1), d2 = ri(2, 5), n2 = ri(1, d2 - 1); return { eq: E(fr(n1, d1), OP.times, fr(n2, d2), OP.eq, '?'), opts: fopts([n1 * n2, d1 * d2], [[n1 + n2, d1 + d2], [n1 * n2, d2]]) }; },
+  () => { const d = ri(2, 6), n = coprime(d), k = ri(2, 4); return { q: 'הכי מצומצם:', eq: E(fr(n * k, d * k), OP.eq, '?'), opts: fopts([n, d], [[n, d * k], [n * k, d]]) }; },
+  () => { const [p, q] = pick([[2, 4], [2, 6], [3, 6], [2, 3], [2, 5], [3, 4]]), a = ri(1, p - 1), c = ri(1, q - 1), L = lcm(p, q); return { eq: E(fr(a, p), OP.plus, fr(c, q), OP.eq, '?'), opts: fopts([a * L / p + c * L / q, L], [[a + c, p + q], [a + c, L]]) }; },
+  () => { let a = ri(2, 9), b; do { b = ri(2, 9); } while (b === a); return { q: 'מה גדול יותר?', eq: '', opts: [{ h: fr(1, a), ok: a < b }, { h: fr(1, b), ok: b < a }] }; },
+  () => { const d = ri(2, 5), n = ri(1, d - 1), k = ri(2, 4); return { eq: E(fr(n, d), OP.eq, fr('?', d * k)), opts: shuffle([n * k, n + (d * k - d), n * k + 1].filter((v, i, a) => a.indexOf(v) === i).map(v => ({ h: N(v), ok: v === n * k }))) }; }
+];
+function drawRace() {
+  view.innerHTML = `<div class="shead"><div class="ttl"><span class="num" style="background:var(--c6)">★</span><div><h2>מרוץ השברים</h2><p>60 שניות, כל הנושאים. רצף תשובות נכונות מכפיל נקודות.</p></div></div></div><section class="panel" id="panel"></section>`;
+  const root = $('#panel');
+  root.innerHTML = `<div class="race" style="justify-content:center">${kobi('wow').replace('class="kobi"', 'class="kobi" style="width:120px;height:120px"')}
+    <p class="stepq">שיא אישי: ${S.race} נקודות</p><button class="tbtn sun" id="start">מתחילים!</button></div>`;
+  $('#start', root).onclick = start;
+  function start() {
+    sfx.ok(); let t = 60, score = 0, combo = 0, lock = false, q, correct = 0;
+    root.innerHTML = `<div class="race"><div class="rtop"><span>${COIN.replace('<svg', '<svg style="width:22px;height:22px;vertical-align:-4px"')} <span id="sc">0</span></span><div class="timer"><i id="tb" style="width:100%"></i></div><span><span id="tt">60</span> שנ׳</span></div>
+      <span class="combo" id="cb" style="font:600 18px var(--font-display);min-height:1.5em"></span><div class="rq" id="rq" dir="ltr"></div><div class="bubs" id="rb"></div></div>`;
+    const timer = setInterval(() => { t--; $('#tt', root) && ($('#tt', root).textContent = t); const tb = $('#tb', root); if (tb) tb.style.width = (t / 60 * 100) + '%'; if (t <= 0) { clearInterval(timer); end(); } }, 1000);
+    window.addEventListener('hashchange', () => clearInterval(timer), { once: true });
+    function nextQ() { q = pick(RACE)(); lock = false; $('#rq', root).innerHTML = `${q.q ? `<span class="qline" dir="rtl">${q.q}</span>` : ''}${q.eq}`; $('#rb', root).innerHTML = q.opts.map((o, k) => `<button class="bub" data-r="${k}">${o.h}</button>`).join(''); }
+    root.onclick = e => {
+      const b = e.target.closest('[data-r]'); if (!b || lock) return; lock = true;
+      const o = q.opts[+b.dataset.r];
+      if (o.ok) { combo++; correct++; const pts = 10 * Math.min(4, 1 + Math.floor(combo / 3)); score += pts; sfx.ok(); b.classList.add('right'); floaty(b, '+' + pts); if (combo % 3 === 0) confetti(...centerOf(b), 30); setTimeout(nextQ, 350); }
+      else { combo = 0; sfx.bad(); b.classList.add('wrong'); $('#rb', root).querySelectorAll('[data-r]').forEach(x => { if (q.opts[+x.dataset.r].ok) x.classList.add('right'); }); setTimeout(nextQ, 1100); }
+      $('#sc', root).textContent = score; $('#cb', root).textContent = combo >= 3 ? `רצף ${combo}! נקודות ×${Math.min(4, 1 + Math.floor(combo / 3))}` : '';
+    };
+    function end() {
+      const best = score > S.race; if (best) { S.race = score; save(); }
+      const coins = Math.floor(correct / 3);
+      root.innerHTML = `<div class="race" style="justify-content:center">${kobi(best ? 'wow' : 'happy').replace('class="kobi"', 'class="kobi" style="width:110px;height:110px"')}<h3 style="margin:0;font:700 34px var(--font-display)">${score} נקודות</h3>
+        <p class="stepq">${best ? 'שיא חדש!' : `השיא שלכם: ${S.race}`} · ${correct} תשובות נכונות · ${coins} מטבעות</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="tbtn sun" id="start">עוד מרוץ</button><a class="tbtn ghost" href="#home" style="text-decoration:none">למפה</a></div></div>`;
+      $('#start', root).onclick = start; sfx.win(); if (best) confetti(innerWidth / 2, innerHeight / 3, 120);
+      if (coins) addCoins(coins, $('.race h3', root));
+    }
+    nextQ();
+  }
 }
-window.addEventListener('hashchange', route);
+
 route();
 </script>
